@@ -8,4 +8,12 @@
         <attribute name="status" optional="YES" attributeType="String"/>
         <attribute name="taskName" optional="YES" attributeType="String"/>
     </entity>
+    <entity name="TaskLog" representedClassName="TaskLog" syncable="YES" codeGenerationType="class">
+        <attribute name="cyclicality" optional="YES" attributeType="String"/>
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="factValue" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="planValue" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="status" optional="YES" attributeType="String"/>
+        <attribute name="taskName" optional="YES" attributeType="String"/>
+    </entity>
 </model>

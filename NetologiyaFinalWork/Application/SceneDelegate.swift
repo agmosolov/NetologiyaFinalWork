@@ -18,29 +18,36 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(windowScene: windowScene)
         
         // Первый экран: MainScreenViewController
-        let firstVC = MainScreenViewController()
-        let firstNav = UINavigationController(rootViewController: firstVC)
-        firstNav.tabBarItem = UITabBarItem(title: "Главная", 
+        let mainScreenVC = MainScreenViewController()
+        let mainScreenNav = UINavigationController(rootViewController: mainScreenVC)
+        mainScreenNav.tabBarItem = UITabBarItem(title: "Главная", 
                                            image: UIImage(systemName: "house"),
                                            tag: 0)
         
         // Второй экран: TasksTableViewController
-        let tableVC1 = TasksTableViewController()
-        let navTable1 = UINavigationController(rootViewController: tableVC1)
-        navTable1.tabBarItem = UITabBarItem(title: "Задачи", 
-                                            image: UIImage(systemName: "list.dash"),
+        let taskTVC = TasksTableViewController()
+        let taskNav = UINavigationController(rootViewController: taskTVC)
+        taskNav.tabBarItem = UITabBarItem(title: "Задачи", 
+                                            image: UIImage(systemName: "target"),
                                             tag: 1)
         
-        // Третий экран: SettingsTableViewController
-        let tableVC2 = SettingsTableViewController()
-        let navTable2 = UINavigationController(rootViewController: tableVC2)
-        navTable2.tabBarItem = UITabBarItem(title: "Настройки", 
+        // Третий экран: TaskLogsTableViewController
+        let logsTVC = TaskLogsTableViewController()
+        let logsNav = UINavigationController(rootViewController: logsTVC)
+        logsNav.tabBarItem = UITabBarItem(title: "Журнал", image: UIImage(systemName: "list.dash"), tag: 2)
+        
+        
+        // Четвертый экран: SettingsTableViewController
+        let settingsTVC = SettingsTableViewController()
+        let settingsNav = UINavigationController(rootViewController: settingsTVC)
+        settingsNav.tabBarItem = UITabBarItem(title: "Настройки", 
                                             image: UIImage(systemName: "gear"),
-                                            tag: 2)
+                                            tag: 3)
+        
         
         // TabBarController
         let tabBarController = UITabBarController()
-        tabBarController.viewControllers = [firstNav, navTable1, navTable2]
+        tabBarController.viewControllers = [mainScreenNav, taskNav, logsNav, settingsNav]
         
         window?.rootViewController = tabBarController
         window?.makeKeyAndVisible()

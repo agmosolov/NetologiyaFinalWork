@@ -7,20 +7,27 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6D0894742EE380C40029A92A /* TaskLogsCoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0894732EE380C40029A92A /* TaskLogsCoreDataManager.swift */; };
+		6D0894762EE381F30029A92A /* TaskLogsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0894752EE381F30029A92A /* TaskLogsTableViewController.swift */; };
 		6D0C8F942EDDF9BD00159A45 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0C8F932EDDF9BD00159A45 /* AppDelegate.swift */; };
 		6D0C8F962EDDF9BD00159A45 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0C8F952EDDF9BD00159A45 /* SceneDelegate.swift */; };
 		6D0C8F982EDDF9BD00159A45 /* MainScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0C8F972EDDF9BD00159A45 /* MainScreenViewController.swift */; };
 		6D0C8F9D2EDDF9BE00159A45 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6D0C8F9C2EDDF9BE00159A45 /* Assets.xcassets */; };
 		6D0C8FA02EDDF9BE00159A45 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 6D0C8F9F2EDDF9BE00159A45 /* Base */; };
-		6D5B28BC2EDF8255000828F7 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5B28BB2EDF8255000828F7 /* CoreDataManager.swift */; };
-		6D5B28BE2EDF869E000828F7 /* TaskTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5B28BD2EDF869E000828F7 /* TaskTableViewCell.swift */; };
-		6D5B28C02EDF98AD000828F7 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5B28BF2EDF98AD000828F7 /* Models.swift */; };
+		6D30B9F72EE3874500BFCF8B /* TaskStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D30B9F62EE3874500BFCF8B /* TaskStatus.swift */; };
+		6D30B9F92EE3875500BFCF8B /* PlanValueForCyclecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D30B9F82EE3875500BFCF8B /* PlanValueForCyclecycle.swift */; };
+		6D30B9FB2EE390FD00BFCF8B /* TaskLogTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D30B9FA2EE390FD00BFCF8B /* TaskLogTableViewCell.swift */; };
+		6D5B28BC2EDF8255000828F7 /* TaskCoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5B28BB2EDF8255000828F7 /* TaskCoreDataManager.swift */; };
+		6D5B28BE2EDF869E000828F7 /* TasksTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5B28BD2EDF869E000828F7 /* TasksTableViewCell.swift */; };
+		6D5B28C02EDF98AD000828F7 /* Cyclicality.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5B28BF2EDF98AD000828F7 /* Cyclicality.swift */; };
 		6DD6E6B52EDF6D60009FE629 /* TasksTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD6E6B42EDF6D60009FE629 /* TasksTableViewController.swift */; };
 		6DD6E6B72EDF6D6E009FE629 /* SettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD6E6B62EDF6D6E009FE629 /* SettingsTableViewController.swift */; };
 		6DD6E6C42EDF7B55009FE629 /* CoreDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6DD6E6C22EDF7B55009FE629 /* CoreDataModel.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6D0894732EE380C40029A92A /* TaskLogsCoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskLogsCoreDataManager.swift; sourceTree = "<group>"; };
+		6D0894752EE381F30029A92A /* TaskLogsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskLogsTableViewController.swift; sourceTree = "<group>"; };
 		6D0C8F902EDDF9BD00159A45 /* NetologiyaFinalWork.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NetologiyaFinalWork.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D0C8F932EDDF9BD00159A45 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6D0C8F952EDDF9BD00159A45 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -29,9 +36,13 @@
 		6D0C8F9F2EDDF9BE00159A45 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6D0C8FA12EDDF9BE00159A45 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6D0C8FA72EDDFEA000159A45 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		6D5B28BB2EDF8255000828F7 /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
-		6D5B28BD2EDF869E000828F7 /* TaskTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTableViewCell.swift; sourceTree = "<group>"; };
-		6D5B28BF2EDF98AD000828F7 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		6D12C3B92EE410E100B997B1 /* DESCRIPTION.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DESCRIPTION.md; sourceTree = "<group>"; };
+		6D30B9F62EE3874500BFCF8B /* TaskStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskStatus.swift; sourceTree = "<group>"; };
+		6D30B9F82EE3875500BFCF8B /* PlanValueForCyclecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanValueForCyclecycle.swift; sourceTree = "<group>"; };
+		6D30B9FA2EE390FD00BFCF8B /* TaskLogTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskLogTableViewCell.swift; sourceTree = "<group>"; };
+		6D5B28BB2EDF8255000828F7 /* TaskCoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCoreDataManager.swift; sourceTree = "<group>"; };
+		6D5B28BD2EDF869E000828F7 /* TasksTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksTableViewCell.swift; sourceTree = "<group>"; };
+		6D5B28BF2EDF98AD000828F7 /* Cyclicality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cyclicality.swift; sourceTree = "<group>"; };
 		6D5B28C12EDF99A3000828F7 /* DEVELOPMEN PLAN.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "DEVELOPMEN PLAN.md"; sourceTree = "<group>"; };
 		6DD6E6B42EDF6D60009FE629 /* TasksTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksTableViewController.swift; sourceTree = "<group>"; };
 		6DD6E6B62EDF6D6E009FE629 /* SettingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewController.swift; sourceTree = "<group>"; };
@@ -49,6 +60,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6D0894772EE383DD0029A92A /* Core Data */ = {
+			isa = PBXGroup;
+			children = (
+				6D5B28BB2EDF8255000828F7 /* TaskCoreDataManager.swift */,
+				6D0894732EE380C40029A92A /* TaskLogsCoreDataManager.swift */,
+				6DD6E6C22EDF7B55009FE629 /* CoreDataModel.xcdatamodeld */,
+			);
+			path = "Core Data";
+			sourceTree = "<group>";
+		};
 		6D0C8F872EDDF9BD00159A45 = {
 			isa = PBXGroup;
 			children = (
@@ -68,22 +89,74 @@
 		6D0C8F922EDDF9BD00159A45 /* NetologiyaFinalWork */ = {
 			isa = PBXGroup;
 			children = (
-				6D0C8F932EDDF9BD00159A45 /* AppDelegate.swift */,
-				6D0C8F952EDDF9BD00159A45 /* SceneDelegate.swift */,
-				6D5B28BF2EDF98AD000828F7 /* Models.swift */,
-				6D0C8F972EDDF9BD00159A45 /* MainScreenViewController.swift */,
-				6DD6E6B42EDF6D60009FE629 /* TasksTableViewController.swift */,
-				6D5B28BD2EDF869E000828F7 /* TaskTableViewCell.swift */,
-				6DD6E6B62EDF6D6E009FE629 /* SettingsTableViewController.swift */,
-				6D5B28BB2EDF8255000828F7 /* CoreDataManager.swift */,
+				6D30B9F42EE386DB00BFCF8B /* Application */,
+				6D30B9F52EE386E400BFCF8B /* Models */,
+				6D30B9F32EE386C200BFCF8B /* Main Screen */,
+				6D30B9F02EE3868900BFCF8B /* Tasks Screen */,
+				6D30B9F22EE386B200BFCF8B /* TaskLogs Screen */,
+				6D30B9F12EE386A900BFCF8B /* Settings Screen */,
+				6D0894772EE383DD0029A92A /* Core Data */,
 				6D0C8F9C2EDDF9BE00159A45 /* Assets.xcassets */,
 				6D0C8F9E2EDDF9BE00159A45 /* LaunchScreen.storyboard */,
-				6DD6E6C22EDF7B55009FE629 /* CoreDataModel.xcdatamodeld */,
 				6D0C8FA12EDDF9BE00159A45 /* Info.plist */,
 				6D0C8FA72EDDFEA000159A45 /* README.md */,
+				6D12C3B92EE410E100B997B1 /* DESCRIPTION.md */,
 				6D5B28C12EDF99A3000828F7 /* DEVELOPMEN PLAN.md */,
 			);
 			path = NetologiyaFinalWork;
+			sourceTree = "<group>";
+		};
+		6D30B9F02EE3868900BFCF8B /* Tasks Screen */ = {
+			isa = PBXGroup;
+			children = (
+				6DD6E6B42EDF6D60009FE629 /* TasksTableViewController.swift */,
+				6D5B28BD2EDF869E000828F7 /* TasksTableViewCell.swift */,
+			);
+			path = "Tasks Screen";
+			sourceTree = "<group>";
+		};
+		6D30B9F12EE386A900BFCF8B /* Settings Screen */ = {
+			isa = PBXGroup;
+			children = (
+				6DD6E6B62EDF6D6E009FE629 /* SettingsTableViewController.swift */,
+			);
+			path = "Settings Screen";
+			sourceTree = "<group>";
+		};
+		6D30B9F22EE386B200BFCF8B /* TaskLogs Screen */ = {
+			isa = PBXGroup;
+			children = (
+				6D0894752EE381F30029A92A /* TaskLogsTableViewController.swift */,
+				6D30B9FA2EE390FD00BFCF8B /* TaskLogTableViewCell.swift */,
+			);
+			path = "TaskLogs Screen";
+			sourceTree = "<group>";
+		};
+		6D30B9F32EE386C200BFCF8B /* Main Screen */ = {
+			isa = PBXGroup;
+			children = (
+				6D0C8F972EDDF9BD00159A45 /* MainScreenViewController.swift */,
+			);
+			path = "Main Screen";
+			sourceTree = "<group>";
+		};
+		6D30B9F42EE386DB00BFCF8B /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				6D0C8F932EDDF9BD00159A45 /* AppDelegate.swift */,
+				6D0C8F952EDDF9BD00159A45 /* SceneDelegate.swift */,
+			);
+			path = Application;
+			sourceTree = "<group>";
+		};
+		6D30B9F52EE386E400BFCF8B /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				6D5B28BF2EDF98AD000828F7 /* Cyclicality.swift */,
+				6D30B9F62EE3874500BFCF8B /* TaskStatus.swift */,
+				6D30B9F82EE3875500BFCF8B /* PlanValueForCyclecycle.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -156,15 +229,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6D5B28BE2EDF869E000828F7 /* TaskTableViewCell.swift in Sources */,
+				6D5B28BE2EDF869E000828F7 /* TasksTableViewCell.swift in Sources */,
 				6D0C8F982EDDF9BD00159A45 /* MainScreenViewController.swift in Sources */,
 				6DD6E6B72EDF6D6E009FE629 /* SettingsTableViewController.swift in Sources */,
 				6D0C8F942EDDF9BD00159A45 /* AppDelegate.swift in Sources */,
 				6DD6E6B52EDF6D60009FE629 /* TasksTableViewController.swift in Sources */,
 				6DD6E6C42EDF7B55009FE629 /* CoreDataModel.xcdatamodeld in Sources */,
-				6D5B28C02EDF98AD000828F7 /* Models.swift in Sources */,
-				6D5B28BC2EDF8255000828F7 /* CoreDataManager.swift in Sources */,
+				6D30B9F72EE3874500BFCF8B /* TaskStatus.swift in Sources */,
+				6D30B9FB2EE390FD00BFCF8B /* TaskLogTableViewCell.swift in Sources */,
+				6D5B28C02EDF98AD000828F7 /* Cyclicality.swift in Sources */,
+				6D5B28BC2EDF8255000828F7 /* TaskCoreDataManager.swift in Sources */,
+				6D0894742EE380C40029A92A /* TaskLogsCoreDataManager.swift in Sources */,
+				6D30B9F92EE3875500BFCF8B /* PlanValueForCyclecycle.swift in Sources */,
 				6D0C8F962EDDF9BD00159A45 /* SceneDelegate.swift in Sources */,
+				6D0894762EE381F30029A92A /* TaskLogsTableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -395,8 +473,7 @@
 				6DD6E6C32EDF7B55009FE629 /* CoreDataModel.xcdatamodel */,
 			);
 			currentVersion = 6DD6E6C32EDF7B55009FE629 /* CoreDataModel.xcdatamodel */;
-			name = CoreDataModel.xcdatamodeld;
-			path = "/Users/agmosolov/Desktop/IOS Developer/01. OWN APPS/DEVELOPING/NetologiyaFinalWork/NetologiyaFinalWork/CoreDataModel.xcdatamodeld";
+			path = CoreDataModel.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};

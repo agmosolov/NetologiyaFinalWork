@@ -7,9 +7,9 @@
 
 import CoreData
 
-final class CoreDataManager {
+final class TaskCoreDataManager {
     
-    static let shared = CoreDataManager()
+    static let shared = TaskCoreDataManager()
     
     private let modelName = "CoreDataModel"
     
@@ -71,7 +71,7 @@ final class CoreDataManager {
         do {
             return try context.fetch(request)
         } catch {
-            print("Fetch error: \(error)")
+            print("!!!Fetch error: \(error)")
             return []
         }
     }
@@ -83,4 +83,3 @@ final class CoreDataManager {
         return Task(context: context)
     }
 }
-
