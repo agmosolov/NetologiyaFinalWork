@@ -123,7 +123,16 @@ class MainScreenViewController: UIViewController {
         setupUI()
         updateAllStats()
         updateAllAchievements()
+        
+        NotificationCenter.default.addObserver(self,
+                    selector: #selector(settingsChanged),
+                    name: NSNotification.Name("SettingsDidChange"),
+                    object: nil)
+        
+        
     }
+    
+    
     
     override func viewWillAppear(_ animated: Bool) {
         loadSettingsFromDefaults()
@@ -131,6 +140,17 @@ class MainScreenViewController: UIViewController {
         updateAllAchievements()
     }
     
+    @objc private func settingsChanged() {
+        DispatchQueue.main.async {
+            self.loadSettingsFromDefaults()
+            self.updateAllStats()
+            self.updateAllAchievements()
+        }
+    }
+    deinit {
+            NotificationCenter.default.removeObserver(self, name: NSNotification.Name("SettingsDidChange"), object: nil)
+        }
+
     
     
     
@@ -213,6 +233,7 @@ class MainScreenViewController: UIViewController {
     private func loadSettingsFromDefaults() {
         let defaults = UserDefaults.standard
         activeTasksToWin = defaults.integer(forKey: "activeTasksToWin")
+        print("\(activeTasksToWin)")
         completedTasksToWin = defaults.integer(forKey: "completedTasksToWin")
         collectedPointsToWin = defaults.integer(forKey: "collectedPointsToWin")
         regimeComplianceToWin = defaults.integer(forKey: "regimeComplianceToWin")
@@ -227,6 +248,7 @@ class MainScreenViewController: UIViewController {
         checkCollectedPoints()
         checkRegimeCompliance()
         checkCountOfAchievments()
+        updateAchievmentLabels()
     }
     
     private func checkActiveTasksToWin() {
@@ -282,7 +304,6 @@ class MainScreenViewController: UIViewController {
     
     private func checkRegimeCompliance() {
         let regimeCompliance = updateRegimeComplianceLabel().forCalculation
-        print(regimeCompliance)
         if regimeCompliance > regimeComplianceToWin {
             achievment4View.image = UIImage(named: "RegimeColor")
             achievment4Title.textColor = .black
@@ -309,6 +330,14 @@ class MainScreenViewController: UIViewController {
             achievment5Title.textColor = .lightGray
             achievment5Label.textColor = .lightGray
         }
+    }
+    
+    private func updateAchievmentLabels() {
+        achievment1Title.text = "\(activeTasksToWin)"
+        achievment2Title.text = "\(completedTasksToWin)"
+        achievment3Title.text = "\(collectedPointsToWin)"
+        achievment4Title.text = "\(regimeComplianceToWin)%"
+        achievment5Title.text = "\(countOfAchievmentsToWin)"
     }
     
     // MARK: - SetupUI

@@ -20,8 +20,8 @@ class TasksTableViewController: UITableViewController {
         setupUI()
         
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.largeTitleDisplayMode = .always // или .automatic
-        title = "Задачи" // заголовок для большого стиля
+        navigationItem.largeTitleDisplayMode = .always
+        title = "Мои задачи"
         
         tableView.register(TasksTableViewCell.self, forCellReuseIdentifier: "TaskTableViewCell")
         
