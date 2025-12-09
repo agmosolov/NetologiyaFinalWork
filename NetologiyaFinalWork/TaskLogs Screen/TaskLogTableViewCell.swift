@@ -95,6 +95,19 @@ class TaskLogTableViewCell: UITableViewCell {
         cyclicalityLabel.text = log.cyclicality
         planValueLabel.text = "\(log.planValue)"
         factValueLabel.text = "\(log.factValue)"
+        
+        switch log.status {
+        case TaskStatus.created.rawValue:
+            contentView.backgroundColor = UIColor.systemGray.withAlphaComponent(0.5)
+        case TaskStatus.launched.rawValue:
+            contentView.backgroundColor = UIColor.systemGreen.withAlphaComponent(0.2)
+        case TaskStatus.run.rawValue:
+            contentView.backgroundColor = UIColor.systemGreen.withAlphaComponent(0.2)
+        case TaskStatus.stopped.rawValue:
+            contentView.backgroundColor = UIColor.systemOrange.withAlphaComponent(0.3)
+        default:
+            contentView.backgroundColor = .white
+        }
     }
 }
 

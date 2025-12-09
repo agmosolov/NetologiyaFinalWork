@@ -14,5 +14,6 @@ enum Cyclicality: String, CaseIterable {
     case biQuarterly = "Раз в полгода"
     case yearly = "Ежегодно"
     case biYearly = "Раз в два года"
+    case indefinite = "Бессрочный"
     case error = "Неопределено"
 }

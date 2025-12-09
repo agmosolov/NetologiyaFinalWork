@@ -29,6 +29,8 @@ class TaskLogsTableViewController: UITableViewController {
     
     private func setupUI() {
         
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .always // или .automatic
         title = "Журнал"
         
         // Добавил кнопку удаления (корзины)

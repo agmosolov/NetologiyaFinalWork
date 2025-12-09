@@ -36,7 +36,7 @@
 		6D0C8F9F2EDDF9BE00159A45 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6D0C8FA12EDDF9BE00159A45 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6D0C8FA72EDDFEA000159A45 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		6D12C3B92EE410E100B997B1 /* DESCRIPTION.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DESCRIPTION.md; sourceTree = "<group>"; };
+		6D12C3B92EE410E100B997B1 /* BRIEF.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = BRIEF.md; sourceTree = "<group>"; };
 		6D30B9F62EE3874500BFCF8B /* TaskStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskStatus.swift; sourceTree = "<group>"; };
 		6D30B9F82EE3875500BFCF8B /* PlanValueForCyclecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanValueForCyclecycle.swift; sourceTree = "<group>"; };
 		6D30B9FA2EE390FD00BFCF8B /* TaskLogTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskLogTableViewCell.swift; sourceTree = "<group>"; };
@@ -99,8 +99,8 @@
 				6D0C8F9C2EDDF9BE00159A45 /* Assets.xcassets */,
 				6D0C8F9E2EDDF9BE00159A45 /* LaunchScreen.storyboard */,
 				6D0C8FA12EDDF9BE00159A45 /* Info.plist */,
+				6D12C3B92EE410E100B997B1 /* BRIEF.md */,
 				6D0C8FA72EDDFEA000159A45 /* README.md */,
-				6D12C3B92EE410E100B997B1 /* DESCRIPTION.md */,
 				6D5B28C12EDF99A3000828F7 /* DEVELOPMEN PLAN.md */,
 			);
 			path = NetologiyaFinalWork;

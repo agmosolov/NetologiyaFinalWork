@@ -19,6 +19,10 @@ class TasksTableViewController: UITableViewController {
         
         setupUI()
         
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .always // или .automatic
+        title = "Задачи" // заголовок для большого стиля
+        
         tableView.register(TasksTableViewCell.self, forCellReuseIdentifier: "TaskTableViewCell")
         
         fetchTasks()
@@ -27,6 +31,7 @@ class TasksTableViewController: UITableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         updateFactValueForAllTasks()
+        fetchTasks()
         startTimer()
     }
     
@@ -37,7 +42,7 @@ class TasksTableViewController: UITableViewController {
     
     private func setupUI() {
         view.backgroundColor = .white
-        
+            
         // Добавил кнопку добавления (плюс)
         let addNewTaskBarButton =
         UIBarButtonItem(barButtonSystemItem: .add,
@@ -52,11 +57,16 @@ class TasksTableViewController: UITableViewController {
                         target: self,
                         action: #selector(didTapDeleteTasksBarButton))
         
-        navigationItem.leftBarButtonItem = deleteTaskBarButton
+        let sortTasksBarButton =
+        UIBarButtonItem(barButtonSystemItem: .refresh,
+                        target: self,
+                        action: #selector(didTapSortTasksBarButton))
+        
+        navigationItem.leftBarButtonItems = [deleteTaskBarButton, sortTasksBarButton]
     }
     
     private func startTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 60.0, repeats: true) { [weak self] _ in
             self?.updateFactValueForAllTasks()
         }
     }
@@ -76,6 +86,23 @@ class TasksTableViewController: UITableViewController {
             tableView.reloadData()
         } catch {
             print("!!!Failed to fetch tasks: \(error)")
+        }
+    }
+    
+    
+    private func fetchAndSortTasks() {
+        // загрузить
+        let context = TaskCoreDataManager.shared.viewContext
+        let request: NSFetchRequest<Task> = Task.fetchRequest()
+        // можно добавить базовую сортировку по дате, если нужно
+        request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
+        do {
+            tasks = try context.fetch(request)
+            // доп сортировка по кастомной лексике
+            tasks.sort(by: sortDescriptorForTasks())
+            tableView.reloadData()
+        } catch {
+            print("!!!Fetch tasks error: \(error)")
         }
     }
     
@@ -122,6 +149,11 @@ class TasksTableViewController: UITableViewController {
         // Обновляем нав. кнопку, чтобы пользователь понял текущее состояние
         navigationItem.leftBarButtonItem?.style = isBatchEditingEnabled ? .plain : .plain
         // При желании скрыть стандартные кнопки редактирования
+    }
+    
+    
+    @objc private func didTapSortTasksBarButton() {
+        fetchTasks()
     }
     
     private func presentStatusActionAlert(for indexPath: IndexPath) {
@@ -192,8 +224,8 @@ class TasksTableViewController: UITableViewController {
         
         self.updateStatusToStopped(for: indexPath)
         self.updateDateToCurrent(for: indexPath)
-        self.updatePlanValueToMinus(for: indexPath)
-        self.updateFactValueToMinus(for: indexPath)
+        self.updatePlanValueToZero(for: indexPath)
+        self.updateFactValueToZero(for: indexPath)
         
         let newLog = tasks[indexPath.row]
         TaskLogsCoreDataManager.shared.createLog(from: newLog)
@@ -243,15 +275,17 @@ class TasksTableViewController: UITableViewController {
         
         switch previousStatus {
         case TaskStatus.created.rawValue:
-            return getPlanValueBasedOnCyclicality(for: indexPath)
+            return 0
         case TaskStatus.launched.rawValue:
             return getPlanValueBasedOnCyclicality(for: indexPath)
         case TaskStatus.run.rawValue:
             return getPlanValueBasedOnCyclicality(for: indexPath)
         case TaskStatus.stopped.rawValue:
             return getPlanValueBasedOnCyclicality(for: indexPath)
+        case TaskStatus.completed.rawValue:
+            return 404001
         default:
-            return 404000
+            return 404002
         }
     }
     
@@ -259,15 +293,17 @@ class TasksTableViewController: UITableViewController {
         
         switch previousStatus {
         case TaskStatus.created.rawValue:
-            return getPlanValueBasedOnCyclicality(for: indexPath)
+            return 0
         case TaskStatus.launched.rawValue:
             return currentFactValue
         case TaskStatus.run.rawValue:
             return currentFactValue
         case TaskStatus.stopped.rawValue:
-            return getPlanValueBasedOnCyclicality(for: indexPath)
+            return 0
+        case TaskStatus.completed.rawValue:
+            return 404003
         default:
-            return 404000
+            return 404004
         }
     }
     
@@ -324,21 +360,15 @@ class TasksTableViewController: UITableViewController {
         return 0
     }
     
-    private func updatePlanValueToMinus(for indexPath: IndexPath) {
-        let task = tasks[indexPath.row]
-        task.planValue = getPlanValueBasedOnCyclicality(for: indexPath) * -1
-        TaskCoreDataManager.shared.saveContext()
-    }
-    
-    private func updateFactValueToMinus(for indexPath: IndexPath) {
-        let task = tasks[indexPath.row]
-        task.factValue = getPlanValueBasedOnCyclicality(for: indexPath) * -1
-        TaskCoreDataManager.shared.saveContext()
-    }
-    
     private func updatePlanValueToZero(for indexPath: IndexPath) {
         let task = tasks[indexPath.row]
         task.planValue = 0
+        TaskCoreDataManager.shared.saveContext()
+    }
+    
+    private func updateFactValueToZero(for indexPath: IndexPath) {
+        let task = tasks[indexPath.row]
+        task.factValue = 0
         TaskCoreDataManager.shared.saveContext()
     }
     
@@ -350,7 +380,7 @@ class TasksTableViewController: UITableViewController {
         if (task.status != nil) {
             let now = Date()
             let diffSec = now.timeIntervalSince(taskDate)
-            let hours = Int64(diffSec / 5) // 3600 часы
+            let hours = Int64(diffSec / 60) // 3600 часы
             
             let plan = task.planValue
             
@@ -383,12 +413,10 @@ class TasksTableViewController: UITableViewController {
         let task = tasks[indexPath.row]
         
         guard let taskDate = task.date else { return 0 }
-        print("taskDate: \(taskDate)")
         if (task.status != nil) {
             let now = Date()
-            print("nowDate: \(now)")
             let diffSec = now.timeIntervalSince(taskDate)
-            let hours = Int64(diffSec / 5) // часы
+            let hours = Int64(diffSec / 60) // 60 часы
             
             let plan = task.planValue
             let result: Int64
@@ -422,6 +450,35 @@ class TasksTableViewController: UITableViewController {
     private func restartTimer() {
         stopTimer()
         startTimer()
+    }
+    
+    
+    private func sortDescriptorForTasks() -> ((Task, Task) -> Bool) {
+        // приоритет: launched, run (периодические состояния), затем stopped, затем created
+        func priority(_ status: String?) -> Int {
+            switch status {
+            case TaskStatus.launched.rawValue, TaskStatus.run.rawValue:
+                return 0
+            case TaskStatus.stopped.rawValue:
+                return 1
+            case TaskStatus.created.rawValue:
+                return 2
+            default:
+                return 3
+            }
+        }
+        return { (a, b) in
+            let pa = priority(a.status)
+            let pb = priority(b.status)
+            if pa == pb {
+                // второстепенно можно сортировать по дате или имени
+                if let da = a.date, let db = b.date {
+                    return da > db
+                }
+                return false
+            }
+            return pa < pb
+        }
     }
     
     

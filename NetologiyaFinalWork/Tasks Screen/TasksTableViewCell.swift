@@ -146,13 +146,26 @@ class TasksTableViewCell: UITableViewCell {
         progressView.progress = Float(min(max(progress, 0.0), 1.0))
         updateProgressAppearance(for: task)
         
+        switch task.status {
+        case TaskStatus.created.rawValue:
+            contentView.backgroundColor = UIColor.systemGray.withAlphaComponent(0.5)
+        case TaskStatus.launched.rawValue:
+            contentView.backgroundColor = UIColor.systemGreen.withAlphaComponent(0.2)
+        case TaskStatus.run.rawValue:
+            contentView.backgroundColor = UIColor.systemGreen.withAlphaComponent(0.2)
+        case TaskStatus.stopped.rawValue:
+            contentView.backgroundColor = UIColor.systemOrange.withAlphaComponent(0.3)
+        default:
+            contentView.backgroundColor = .white
+        }
+        
     }
     
     private func updateProgressAppearance(for task: Task) {
         let plan = max(task.planValue, 1) // чтобы избежать деления на ноль
         let progressValue = max(0.0, min(1.0, Double(task.factValue) / Double(plan)))
         progressView.progress = Float(progressValue)
-
+        
         // цвет в зависимости от условий
         if task.factValue < 0 {
             progressView.progressTintColor = .red

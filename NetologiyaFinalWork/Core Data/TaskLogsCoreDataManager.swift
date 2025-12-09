@@ -69,4 +69,31 @@ final class TaskLogsCoreDataManager {
             print("!!!Delete logs error: \(error)")
         }
     }
+    
+    func countLogs(withStatuses statuses: [String]) -> Int {
+            let ctx = viewContext
+            let request: NSFetchRequest<TaskLog> = TaskLog.fetchRequest()
+            let pred = NSPredicate(format: "status IN %@", statuses)
+            request.predicate = pred
+            do {
+                let logs = try ctx.fetch(request)
+                return logs.count
+            } catch {
+                print("!!!Fetch logs error: \(error)")
+                return 0
+            }
+        }
+    
+    func sumFactAndPlanValues() -> (sumFact: Int, sumPlan: Int) {
+            let req: NSFetchRequest<TaskLog> = TaskLog.fetchRequest()
+            do {
+                let logs = try viewContext.fetch(req)
+                let sumFact = logs.reduce(0) { $0 + Int($1.factValue) }
+                let sumPlan = logs.reduce(0) { $0 + Int($1.planValue) }
+                return (sumFact, sumPlan)
+            } catch {
+                print("!!!Fetch logs error: \(error)")
+                return (0, 0)
+            }
+        }
 }
