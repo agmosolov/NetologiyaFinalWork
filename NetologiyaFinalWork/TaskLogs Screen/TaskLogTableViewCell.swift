@@ -98,13 +98,13 @@ class TaskLogTableViewCell: UITableViewCell {
         
         switch log.status {
         case TaskStatus.created.rawValue:
-            contentView.backgroundColor = UIColor.systemGray.withAlphaComponent(0.5)
+            contentView.backgroundColor = UIColor.white.withAlphaComponent(0.1)
         case TaskStatus.launched.rawValue:
-            contentView.backgroundColor = UIColor.systemGreen.withAlphaComponent(0.2)
+            contentView.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.1)
         case TaskStatus.run.rawValue:
-            contentView.backgroundColor = UIColor.systemGreen.withAlphaComponent(0.2)
+            contentView.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.1)
         case TaskStatus.stopped.rawValue:
-            contentView.backgroundColor = UIColor.systemOrange.withAlphaComponent(0.3)
+            contentView.backgroundColor = UIColor.gray.withAlphaComponent(0.1)
         default:
             contentView.backgroundColor = .white
         }

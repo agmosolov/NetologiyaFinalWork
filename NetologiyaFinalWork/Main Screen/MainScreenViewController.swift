@@ -233,7 +233,6 @@ class MainScreenViewController: UIViewController {
     private func loadSettingsFromDefaults() {
         let defaults = UserDefaults.standard
         activeTasksToWin = defaults.integer(forKey: "activeTasksToWin")
-        print("\(activeTasksToWin)")
         completedTasksToWin = defaults.integer(forKey: "completedTasksToWin")
         collectedPointsToWin = defaults.integer(forKey: "collectedPointsToWin")
         regimeComplianceToWin = defaults.integer(forKey: "regimeComplianceToWin")
@@ -348,7 +347,8 @@ class MainScreenViewController: UIViewController {
         
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
-        title = "Режим"
+        title = "Мой режим"
+        navigationController?.navigationBar.largeTitleTextAttributes = [.foregroundColor: UIColor.black]
         
         batteryTitle.text = "Выполнение"
         batteryTitle.textAlignment = .center

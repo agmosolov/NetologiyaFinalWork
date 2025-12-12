@@ -13,6 +13,15 @@ class TasksTableViewController: UITableViewController {
     private var tasks: [Task] = []
     private var isBatchEditingEnabled = false
     private var timer: Timer?
+    private var originalTaskName: String?
+    private var isAlphabetSortEnabled = false
+    private var complexAlphabetSortEnabled = false
+    
+    var editOrderButton: UIBarButtonItem!
+    var addNewTaskBarButton: UIBarButtonItem!
+    var sortByAlphaButton: UIBarButtonItem!
+    var sortComplexButton: UIBarButtonItem!
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,7 +30,8 @@ class TasksTableViewController: UITableViewController {
         
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
-        title = "Мои задачи"
+        title = "Задачи"
+        navigationController?.navigationBar.largeTitleTextAttributes = [.foregroundColor: UIColor.black]
         
         tableView.register(TasksTableViewCell.self, forCellReuseIdentifier: "TaskTableViewCell")
         
@@ -44,27 +54,59 @@ class TasksTableViewController: UITableViewController {
         view.backgroundColor = .white
             
         // Добавил кнопку добавления (плюс)
-        let addNewTaskBarButton =
+        
+        addNewTaskBarButton =
         UIBarButtonItem(barButtonSystemItem: .add,
                         target: self,
                         action: #selector(didTapAddNewTaskBarButton))
+        addNewTaskBarButton.tintColor = .systemBlue
         
         navigationItem.rightBarButtonItem = addNewTaskBarButton
         
-        // Добавил кнопку удаления (корзины)
-        let deleteTaskBarButton =
-        UIBarButtonItem(barButtonSystemItem: .trash,
-                        target: self,
-                        action: #selector(didTapDeleteTasksBarButton))
+        sortByAlphaButton = UIBarButtonItem(
+            image: UIImage(systemName: "textformat.abc"),
+            style: .plain,
+            target: self,
+            action: #selector(sortByAlphabet))
+        sortByAlphaButton.tintColor = .systemBlue
+    
         
-        let sortTasksBarButton =
-        UIBarButtonItem(barButtonSystemItem: .refresh,
-                        target: self,
-                        action: #selector(didTapSortTasksBarButton))
+        editOrderButton = UIBarButtonItem(
+            image: UIImage(systemName: "shuffle"),
+            style: .plain,
+            target: self,
+            action: #selector(toggleReorder)
+        )
+        editOrderButton.tintColor = .black
         
-        navigationItem.leftBarButtonItems = [deleteTaskBarButton, sortTasksBarButton]
+        
+        sortComplexButton = UIBarButtonItem(
+            image: UIImage(systemName: "tray.2"),
+            style: .plain,
+            target: self,
+            action: #selector(sortByComplexAlphabet))
+        sortComplexButton.tintColor = .systemBlue
+    
+            navigationItem.leftBarButtonItems = [editOrderButton, sortByAlphaButton, sortComplexButton]
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
+
     }
     
+    @objc private func toggleReorder() {
+        let isEditingActive = tableView.isEditing
+        tableView.setEditing(!isEditingActive, animated: true)
+        editOrderButton.tintColor = isEditingActive ? .black : .systemBlue
+    }
+    
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
+    }
+    
+    
+    // Установка таймера в секундах (УСКОРЕНИЕ)
     private func startTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: 60.0, repeats: true) { [weak self] _ in
             self?.updateFactValueForAllTasks()
@@ -78,9 +120,10 @@ class TasksTableViewController: UITableViewController {
     
     
     private func fetchTasks() {
-        
         let context = TaskCoreDataManager.shared.viewContext
         let request: NSFetchRequest<Task> = Task.fetchRequest()
+        // пример сортировки по полю orderIndex
+        request.sortDescriptors = [NSSortDescriptor(key: "orderIndex", ascending: true)]
         do {
             tasks = try context.fetch(request)
             tableView.reloadData()
@@ -89,22 +132,78 @@ class TasksTableViewController: UITableViewController {
         }
     }
     
+    @objc private func sortByAlphabet() {
+        isAlphabetSortEnabled.toggle()
+        tasks.sort { ($0.taskName ?? "") < ($1.taskName ?? "") }
+
+        // обновляем orderIndex согласно новом порядке
+        for (idx, task) in tasks.enumerated() {
+            task.orderIndex = Int64(idx)
+        }
+
+        TaskCoreDataManager.shared.saveContext()
+        fetchTasks()
+        tableView.reloadData()
+    }
     
-    private func fetchAndSortTasks() {
-        // загрузить
-        let context = TaskCoreDataManager.shared.viewContext
-        let request: NSFetchRequest<Task> = Task.fetchRequest()
-        // можно добавить базовую сортировку по дате, если нужно
-        request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
-        do {
-            tasks = try context.fetch(request)
-            // доп сортировка по кастомной лексике
-            tasks.sort(by: sortDescriptorForTasks())
-            tableView.reloadData()
-        } catch {
-            print("!!!Fetch tasks error: \(error)")
+    @objc private func sortByComplexAlphabet() {
+        complexAlphabetSortEnabled.toggle()
+        if complexAlphabetSortEnabled {
+            tasks.sort { (a, b) -> Bool in
+                // приоритет статусов
+                let orderA = sortPriorityForStatus(status: a.status)
+                let orderB = sortPriorityForStatus(status: b.status)
+                if orderA != orderB { return orderA < orderB }
+                // внутри launched/run: по иконке
+                if a.status == TaskStatus.launched.rawValue || a.status == TaskStatus.run.rawValue {
+                    let iconA = iconPriority(t: a)
+                    let iconB = iconPriority(t: b)
+                    if iconA != iconB { return iconA < iconB }
+                    // если одинаковы, можно по date или taskName
+                    return (a.taskName ?? "") < (b.taskName ?? "")
+                }
+                // внутри stopped/created: алфавитный порядок
+                if a.status == TaskStatus.stopped.rawValue || a.status == TaskStatus.created.rawValue {
+                    return (a.taskName ?? "") < (b.taskName ?? "")
+                }
+                return false
+            }
+        } else {
+            // вернуть обратно к текущей обычной сортировке, если нужно
+            // например сорт по orderIndex
+            tasks.sort { ($0.orderIndex) < ($1.orderIndex) }
+        }
+        // сохраняем новый порядок
+        for (idx, t) in tasks.enumerated() {
+            t.orderIndex = Int64(idx)
+        }
+        TaskCoreDataManager.shared.saveContext()
+        fetchTasks()
+        tableView.reloadData()
+    }
+
+    
+    private func sortPriorityForStatus( status: String?) -> Int {
+        switch status {
+        case TaskStatus.launched.rawValue, TaskStatus.run.rawValue:
+            return 0
+        case TaskStatus.stopped.rawValue:
+            return 1
+        case TaskStatus.created.rawValue:
+            return 2
+        default:
+            return 3
         }
     }
+    
+    private func iconPriority( t: Task) -> Int {
+        // 0 - arrow.minus, 1 - arrow.backward, 2 - arrow.forward
+        // предполагаем, что есть поле cyclicality или другой маркер иконки
+        // простейшая заглушка:
+        // если у вас есть очередность в вашем коде, верните соответствующий приоритет
+        return 0
+    }
+
     
     @objc private func didTapAddNewTaskBarButton() {
         let alert = UIAlertController(title: "Новая задача", message: "Введите название и выберите цикличность", preferredStyle: .alert)
@@ -114,14 +213,16 @@ class TasksTableViewController: UITableViewController {
         }
         
         // выбор цикличности через action sheet внутри alert
-        for cycle in Cyclicality.allCases {
+        let allCycles: [Cyclicality] = Cyclicality.allCases.filter { $0 != .error }
+
+        for cycle in allCycles {
             alert.addAction(UIAlertAction(title: cycle.rawValue, style: .default, handler: { [weak self] _ in
                 self?.createTask(withName: alert.textFields?.first?.text ?? "", cyclicality: cycle)
             }))
         }
         
         // кнопка отмены
-        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "Отмена", style: .destructive, handler: nil))
         
         // если пользователь ввёл текст и нажал один из вариантов цикла, обработчик создаёт задачу
         present(alert, animated: true, completion: nil)
@@ -129,8 +230,17 @@ class TasksTableViewController: UITableViewController {
     
     private func createTask(withName name: String, cyclicality: Cyclicality) {
         let context = TaskCoreDataManager.shared.viewContext
+        let trimmedName = (name).trimmingCharacters(in: .whitespacesAndNewlines)
+        let finalName = trimmedName.isEmpty ? "Без названия" : trimmedName
+
+        if isTaskNameExists(name: finalName) {
+            showNameExistsAlert(for: finalName)
+            return
+        }
+        
+
         let newTask = Task(context: context)
-        newTask.taskName = name.isEmpty ? "Без названия" : name
+        newTask.taskName = finalName
         newTask.cyclicality = cyclicality.rawValue
         newTask.status = TaskStatus.created.rawValue
         newTask.planValue = 0
@@ -141,6 +251,29 @@ class TasksTableViewController: UITableViewController {
         TaskLogsCoreDataManager.shared.createLog(from: newTask)
         fetchTasks()
     }
+    
+    private func isTaskNameExists( name: String) -> Bool {
+        let context = TaskCoreDataManager.shared.viewContext
+        let request: NSFetchRequest<Task> = Task.fetchRequest()
+        request.predicate = NSPredicate(format: "taskName == %@", name)
+        do {
+            let count = try context.count(for: request)
+            return count > 0
+        } catch {
+            print("!!!Check name exists error: \(error)")
+            return false
+        }
+    }
+    
+    private func showNameExistsAlert(for name: String) {
+        let alert = UIAlertController(title: "Ошибка",
+                                      message: "Задача с таким именем уже существует. Введите уникальное название.",
+                                      preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "ОК", style: .default, handler: { [weak self] _ in
+            self?.didTapAddNewTaskBarButton()}))
+        present(alert, animated: true, completion: nil)
+        }
+    
     
     @objc private func didTapDeleteTasksBarButton() {
         isBatchEditingEnabled.toggle()
@@ -175,8 +308,21 @@ class TasksTableViewController: UITableViewController {
             self?.tapStopTask(for: indexPath)
         }))
         
+        
+        alert.addAction(UIAlertAction(title: "Переименовать",style: .default, handler: { [weak self] _ in
+            self?.tapRenameTask(for: indexPath)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Изменить цикличность", style: .default, handler: { [weak self] _ in
+            self?.tapChangeCyclicality(for: indexPath)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Удалить", style: .destructive, handler: { [weak self] _ in
+            self?.confirmDeleteTaskAndAllLogs(for: indexPath)
+        }))
+        
         // Отменить
-        alert.addAction(UIAlertAction(title: "Выйти",
+        alert.addAction(UIAlertAction(title: "Выйти без изменений",
                                       style: .cancel,
                                       handler: nil))
         
@@ -196,22 +342,16 @@ class TasksTableViewController: UITableViewController {
         
         let updatedTask = tasks[indexPath.row]
         
-        
-        
         updatedTask.status = updateStatusBasedOnPreviousForLogs(from: (TaskStatus(rawValue: currentStatus!) ?? .completed).rawValue)
         task.status = updateStatusBasedOnPreviousExecuteTap(from: currentStatus ?? "error")
         
-        
         updatedTask.planValue = updatePlanValueBasedOnPreviousTaskStatusExecuteTap(from: currentStatus ?? "", and: indexPath)
         
-        
         updatedTask.factValue = updateFactValueBasedOnPreviousTaskStatusExecuteTap(from: currentStatus ?? "", and: indexPath, with: currentFactValue)
-        
         
         TaskLogsCoreDataManager.shared.createLog(from: updatedTask)
         
         task.status = updateStatusBasedOnPreviousExecuteTap(from: currentStatus ?? "error")
-        
         
         updateFactValueForAllTasks()
         restartTimer()
@@ -220,22 +360,92 @@ class TasksTableViewController: UITableViewController {
     
     private func tapStopTask(for indexPath: IndexPath) {
         
-//        let task = tasks[indexPath.row]
+        let task = tasks[indexPath.row]
+        guard let previousStatus = task.status else { return }
         
         self.updateStatusToStopped(for: indexPath)
         self.updateDateToCurrent(for: indexPath)
+        task.factValue = updateFactValueBasedOnPreviousTaskStatusStopTap(from: previousStatus, and: indexPath)
         self.updatePlanValueToZero(for: indexPath)
-        self.updateFactValueToZero(for: indexPath)
         
         let newLog = tasks[indexPath.row]
+        newLog.planValue = updatePlanValueBasedOnPreviousTaskStatusForTaskLogStopTap(from: previousStatus, and: indexPath)
         TaskLogsCoreDataManager.shared.createLog(from: newLog)
         
-        self.updatePlanValueToZero(for: indexPath)
-        
         updateFactValueForAllTasks()
+        updatePlanValueForAllTasksBasedOnCurrentStatus()
+    }
+    
+    @objc private func tapRenameTask(for indexPath: IndexPath) {
+        let task = tasks[indexPath.row]
+        let currentName = task.taskName ?? ""
+        let alert = UIAlertController(title: "Переименовать задачу", message: nil, preferredStyle: .alert)
+        alert.addTextField { tf in
+            tf.text = currentName
+            tf.placeholder = "Новое имя"
+        }
+        alert.addAction(UIAlertAction(title: "Сохранить", style: .default, handler: { [weak self] _ in
+            if let newName = alert.textFields?.first?.text, !newName.isEmpty {
+                self?.renameTask(at: indexPath, to: newName)
+            }
+        }))
+        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel, handler: nil))
+        present(alert, animated: true)
+    }
+
+    private func renameTask(at indexPath: IndexPath, to newName: String) {
+        let task = tasks[indexPath.row]
+        let oldName = task.taskName
+        task.taskName = newName
+        // обновление логов, если нужно: сменить или сохранить новое имя в связанных TaskLog
+        let logs = TaskLogsCoreDataManager.shared.fetchLogs(predicate: NSPredicate(format: "taskName == %@", oldName ?? ""))
+        for log in logs {
+            log.taskName = newName
+        }
+        TaskCoreDataManager.shared.saveContext()
+        fetchTasks()
     }
     
     
+    @objc private func tapChangeCyclicality(for indexPath: IndexPath) {
+        let task = tasks[indexPath.row]
+        let alert = UIAlertController(title: "Изменить цикличность, задача будет остановлена", message: nil, preferredStyle: .actionSheet)
+        let allCycles: [Cyclicality] = [.daily, .weekly, .monthly, .biMonthly, .quarterly, .biQuarterly, .yearly, .biYearly]
+
+        // сначала можно остановить задачу здесь, если нужно до смены цикла
+        // но мы хотим делать это после выбора цикла
+        for cycle in allCycles {
+            alert.addAction(UIAlertAction(title: cycle.rawValue, style: .default, handler: { [weak self] _ in
+                // 1) сначала применяем остановку до смены цикла, если это часть логики
+                self?.tapStopTask(for: indexPath)
+
+                // 2) затем меняем цикличность и сохраняем
+                task.cyclicality = cycle.rawValue
+                TaskCoreDataManager.shared.saveContext()
+                self?.fetchTasks()
+            }))
+        }
+        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel, handler: nil))
+        present(alert, animated: true)
+    }
+
+
+    private func updateLogsForTaskName(_ newName: String, from oldName: String?) {
+        guard let old = oldName else { return }
+        let logs = TaskLogsCoreDataManager.shared.fetchLogs(predicate: NSPredicate(format: "taskName == %@", old))
+        for log in logs {
+            log.taskName = newName
+        }
+    }
+    
+    
+    
+    
+    private func updateDateToCurrent(for indexPath: IndexPath) {
+        let task = tasks[indexPath.row]
+        task.date = Date()
+        TaskCoreDataManager.shared.saveContext()
+    }
     
     
     private func updateStatusBasedOnPreviousForLogs(from oldStatus: String) -> String {
@@ -270,49 +480,6 @@ class TasksTableViewController: UITableViewController {
         }
     }
     
-    
-    private func updatePlanValueBasedOnPreviousTaskStatusExecuteTap(from previousStatus: String, and indexPath: IndexPath) -> Int64 {
-        
-        switch previousStatus {
-        case TaskStatus.created.rawValue:
-            return 0
-        case TaskStatus.launched.rawValue:
-            return getPlanValueBasedOnCyclicality(for: indexPath)
-        case TaskStatus.run.rawValue:
-            return getPlanValueBasedOnCyclicality(for: indexPath)
-        case TaskStatus.stopped.rawValue:
-            return getPlanValueBasedOnCyclicality(for: indexPath)
-        case TaskStatus.completed.rawValue:
-            return 404001
-        default:
-            return 404002
-        }
-    }
-    
-    private func updateFactValueBasedOnPreviousTaskStatusExecuteTap(from previousStatus: String, and indexPath: IndexPath, with currentFactValue: Int64) -> Int64 {
-        
-        switch previousStatus {
-        case TaskStatus.created.rawValue:
-            return 0
-        case TaskStatus.launched.rawValue:
-            return currentFactValue
-        case TaskStatus.run.rawValue:
-            return currentFactValue
-        case TaskStatus.stopped.rawValue:
-            return 0
-        case TaskStatus.completed.rawValue:
-            return 404003
-        default:
-            return 404004
-        }
-    }
-    
-    private func updateDateToCurrent(for indexPath: IndexPath) {
-        let task = tasks[indexPath.row]
-        task.date = Date()
-        TaskCoreDataManager.shared.saveContext()
-    }
-    
     private func updateStatusToCreated(for indexPath: IndexPath) {
         let task = tasks[indexPath.row]
         task.status = TaskStatus.created.rawValue
@@ -338,6 +505,40 @@ class TasksTableViewController: UITableViewController {
         TaskCoreDataManager.shared.saveContext()
     }
     
+    
+    private func updatePlanValueBasedOnPreviousTaskStatusExecuteTap(from previousStatus: String, and indexPath: IndexPath) -> Int64 {
+        
+        switch previousStatus {
+        case TaskStatus.completed.rawValue:
+            return 404001
+        default:
+            return getPlanValueBasedOnCyclicality(for: indexPath)
+        }
+    }
+    
+    private func updatePlanValueBasedOnPreviousTaskStatusForTaskStopTap(from previousStatus: String, and indexPath: IndexPath) -> Int64 {
+        
+        switch previousStatus {
+        
+        case TaskStatus.completed.rawValue:
+            return 404002
+        default:
+            return 0
+        }
+    }
+    
+    private func updatePlanValueBasedOnPreviousTaskStatusForTaskLogStopTap(from previousStatus: String, and indexPath: IndexPath) -> Int64 {
+        
+        switch previousStatus {
+        
+        case TaskStatus.completed.rawValue:
+            return 404002
+        case TaskStatus.run.rawValue, TaskStatus.launched.rawValue:
+            return getPlanValueBasedOnCyclicality(for: indexPath) * -1
+        default:
+            return 0
+        }
+    }
     
     private func updatePlanValueBasedOnCyclicality(for indexPath: IndexPath) {
         let task = tasks[indexPath.row]
@@ -366,6 +567,68 @@ class TasksTableViewController: UITableViewController {
         TaskCoreDataManager.shared.saveContext()
     }
     
+    private func updatePlanValueForTaskBasedCurrentStatus(for indexPath: IndexPath) {
+        
+        let task = tasks[indexPath.row]
+        
+        switch task.status {
+        case TaskStatus.created.rawValue, TaskStatus.stopped.rawValue:
+            return task.planValue = 0
+        default:
+            task.planValue = getPlanValueBasedOnCyclicality(for: indexPath)
+        }
+        
+        TaskCoreDataManager.shared.saveContext()
+        fetchTasks()
+        tableView.reloadData()
+        
+    }
+    
+    private func updatePlanValueForAllTasksBasedOnCurrentStatus() {
+        for (index, _) in tasks.enumerated() {
+            let indexPath = IndexPath(row: index, section: 0)
+            updatePlanValueForTaskBasedCurrentStatus(for: indexPath)
+        }
+        // таблица может обновиться внутри updateFactValue, но на всякий случай:
+        tableView.reloadData()
+    }
+    
+    
+    private func updateFactValueBasedOnPreviousTaskStatusStopTap(from previousStatus: String, and indexPath: IndexPath) -> Int64 {
+        
+        switch previousStatus {
+        
+        case TaskStatus.completed.rawValue:
+            return 404005
+        case TaskStatus.run.rawValue, TaskStatus.launched.rawValue:
+            return getPlanValueBasedOnCyclicality(for: indexPath) * -1
+        default:
+            return 0
+        }
+    
+    }
+    
+    private func updateFactValueBasedOnPreviousTaskStatusExecuteTap(from previousStatus: String, and indexPath: IndexPath, with currentFactValue: Int64) -> Int64 {
+        
+        switch previousStatus {
+        case TaskStatus.created.rawValue:
+            return getPlanValueBasedOnCyclicality(for: indexPath)
+        case TaskStatus.launched.rawValue:
+            return currentFactValue
+        case TaskStatus.run.rawValue:
+            return currentFactValue
+        case TaskStatus.stopped.rawValue:
+            return getPlanValueBasedOnCyclicality(for: indexPath)
+        case TaskStatus.completed.rawValue:
+            return 404003
+        default:
+            return 404004
+        }
+    }
+    
+    
+    
+    
     private func updateFactValueToZero(for indexPath: IndexPath) {
         let task = tasks[indexPath.row]
         task.factValue = 0
@@ -380,7 +643,7 @@ class TasksTableViewController: UITableViewController {
         if (task.status != nil) {
             let now = Date()
             let diffSec = now.timeIntervalSince(taskDate)
-            let hours = Int64(diffSec / 60) // 3600 часы
+            let hours = Int64(diffSec / 3600) // УСКОРЕНИЕ 60 - минуты, 3600 - часы
             
             let plan = task.planValue
             
@@ -506,15 +769,44 @@ class TasksTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let deleteAction = UIContextualAction(style: .destructive, title: "Удалить") { [weak self] (action, view, completion) in
-            self?.deleteTask(at: indexPath)
+        let editAction = UIContextualAction(style: .normal, title: "Изменить") { [weak self] action, view, completion in
+            self?.presentStatusActionAlert(for: indexPath) // или ваш метод редактирования
+            
             completion(true)
         }
-        return UISwipeActionsConfiguration(actions: [deleteAction])
+        editAction.backgroundColor = .systemGreen
+        return UISwipeActionsConfiguration(actions: [editAction])
+    }
+    
+    private func confirmDeleteTaskAndAllLogs(for indexPath: IndexPath) {
+        let task = tasks[indexPath.row]
+        let alert = UIAlertController(title: "Удалить задачу и историю",
+                                      message: "Вы действительно хотите удалить  задачу \(task.taskName ?? "") и всю её историю?",
+                                      preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Удалить", style: .destructive, handler: { [weak self] _ in
+            self?.deleteAllLogs(forTaskName: task.taskName)
+            self?.deleteTask(at: indexPath)
+        }))
+        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel, handler: nil))
+        present(alert, animated: true, completion: nil)
+    }
+
+    private func deleteAllLogs(forTaskName name: String?) {
+        guard let name = name else { return }
+        let logs = TaskLogsCoreDataManager.shared.fetchLogs(predicate: NSPredicate(format: "taskName == %@", name))
+        for log in logs {
+            TaskLogsCoreDataManager.shared.viewContext.delete(log)
+        }
+        TaskLogsCoreDataManager.shared.saveContext()
     }
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        return nil
+        let deleteAction = UIContextualAction(style: .destructive, title: "Удалить") { [weak self] _, _, completion in
+            self?.confirmDeleteTaskAndAllLogs(for: indexPath)
+            completion(true)
+        }
+        deleteAction.backgroundColor = .systemRed
+        return UISwipeActionsConfiguration(actions: [deleteAction])
     }
     
     private func deleteTask(at indexPath: IndexPath) {
@@ -525,16 +817,11 @@ class TasksTableViewController: UITableViewController {
         tasks.remove(at: indexPath.row)
         tableView.deleteRows(at: [indexPath], with: .automatic)
     }
+
     
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle,
-                            forRowAt indexPath: IndexPath) {
+    override func tableView( _ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            let taskToDelete = tasks[indexPath.row]
-            let context = TaskCoreDataManager.shared.viewContext
-            context.delete(taskToDelete)
-            TaskCoreDataManager.shared.saveContext()
-            tasks.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .automatic)
+            confirmDeleteTaskAndAllLogs(for: indexPath)
         }
     }
     
@@ -543,4 +830,18 @@ class TasksTableViewController: UITableViewController {
         presentStatusActionAlert(for: indexPath)
     }
     
+    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool { true }
+
+    override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        let moved = tasks.remove(at: sourceIndexPath.row)
+        tasks.insert(moved, at: destinationIndexPath.row)
+
+        // обновляем orderIndex в каждом элементе в новой последовательности
+        for (idx, task) in tasks.enumerated() {
+            task.orderIndex = Int64(idx)
+        }
+
+        TaskCoreDataManager.shared.saveContext()
+        fetchTasks() // если нужен повторный рендер
+    }
 }

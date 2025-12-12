@@ -6,11 +6,10 @@
 //
 
 enum TaskStatus: String {
-    
-    case created = "Created"
-    case launched = "Launched"
-    case run = "Run"
-    case completed = "Completed"
-    case stopped = "Stopped"
-    case error = "Error"
+    case created = "Создано"
+    case launched = "Запущено"
+    case run = "Активно"
+    case completed = "Завершено"
+    case stopped = "Остановлено"
+    case error = "Ошибка статуса"
 }

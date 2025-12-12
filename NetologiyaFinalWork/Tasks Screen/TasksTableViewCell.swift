@@ -19,6 +19,10 @@ class TasksTableViewCell: UITableViewCell {
     let earnedLabel = UILabel()
     let fromLabel = UILabel()
     let progressLabel = UILabel()
+    var progressPercentLabel = UILabel()
+    
+    let darkGreen = UIColor(red: 0.0, green: 0.39, blue: 0.0, alpha: 1.0)
+    let darkYellow = UIColor(red: 0.92, green: 0.74, blue: 0.15, alpha: 1.0)
     
     // Init
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -44,6 +48,7 @@ class TasksTableViewCell: UITableViewCell {
         earnedLabel.translatesAutoresizingMaskIntoConstraints = false
         fromLabel.translatesAutoresizingMaskIntoConstraints = false
         progressLabel.translatesAutoresizingMaskIntoConstraints = false
+        progressPercentLabel.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(taskNameLabel)
         contentView.addSubview(progressLabel)
         contentView.addSubview(cyclicalityLabel)
@@ -54,6 +59,7 @@ class TasksTableViewCell: UITableViewCell {
         contentView.addSubview(factValueLabel)
         contentView.addSubview(fromLabel)
         contentView.addSubview(planValueLabel)
+        contentView.addSubview(progressPercentLabel)
         
         // Пример ограничений (адаптируйте под дизайн)
         let padding: CGFloat = 12
@@ -66,31 +72,36 @@ class TasksTableViewCell: UITableViewCell {
             cyclicalityLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
             cyclicalityLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
             
+            progressLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
+            
             progressView.topAnchor.constraint(equalTo: taskNameLabel.bottomAnchor, constant: padding),
-            progressView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
+            progressView.leadingAnchor.constraint(equalTo: progressLabel.leadingAnchor, constant: padding * 2),
             progressView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
             
+            progressLabel.centerYAnchor.constraint(equalTo: progressView.centerYAnchor),
+            
             statusLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: padding),
-            statusLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
+            statusLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
             
             dateLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: padding),
-            dateLabel.leadingAnchor.constraint(equalTo: statusLabel.trailingAnchor, constant: padding),
+            dateLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
             
             earnedLabel.centerYAnchor.constraint(equalTo: planValueLabel.centerYAnchor),
             earnedLabel.leadingAnchor.constraint(equalTo: dateLabel.trailingAnchor, constant: padding),
             
             factValueLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: padding),
-            factValueLabel.leadingAnchor.constraint(equalTo: earnedLabel.trailingAnchor, constant: padding),
+            factValueLabel.leadingAnchor.constraint(equalTo: earnedLabel.trailingAnchor, constant: padding / 3),
             
             fromLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: padding),
-            fromLabel.leadingAnchor.constraint(equalTo: factValueLabel.trailingAnchor, constant: padding),
+            fromLabel.leadingAnchor.constraint(equalTo: factValueLabel.trailingAnchor, constant: padding / 3),
             
             planValueLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: padding),
-            planValueLabel.leadingAnchor.constraint(equalTo: fromLabel.trailingAnchor, constant: padding),
+            planValueLabel.leadingAnchor.constraint(equalTo: fromLabel.trailingAnchor, constant: padding / 3),
             
-            progressLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: padding),
-            progressLabel.leadingAnchor.constraint(equalTo: planValueLabel.trailingAnchor, constant: padding),
-            progressLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
+            progressPercentLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: padding),
+            progressPercentLabel.leadingAnchor.constraint(equalTo: planValueLabel.trailingAnchor, constant: padding / 3),
+            
+       
             
             // Нижний правый
             contentView.bottomAnchor.constraint(greaterThanOrEqualTo: factValueLabel.bottomAnchor, constant: padding)
@@ -106,6 +117,7 @@ class TasksTableViewCell: UITableViewCell {
         earnedLabel.font = UIFont.systemFont(ofSize: 10)
         fromLabel.font = UIFont.systemFont(ofSize: 10)
         progressLabel.font = UIFont.systemFont(ofSize: 10, weight: .bold)
+        progressPercentLabel.font = UIFont.systemFont(ofSize: 10)
     }
     
     private func configureDateLabel(for date: Date) {
@@ -132,14 +144,17 @@ class TasksTableViewCell: UITableViewCell {
         cyclicalityLabel.text = task.cyclicality
         
         // Новые подписи
-        earnedLabel.text = "Начислено:"
+        earnedLabel.text = "Результат:"
         fromLabel.text = "из:"
         
         // Значения
+        let plan = max(task.planValue, 1)
+        let progressPercentDouble = Double(task.factValue) / Double(plan)
+        let progressPercentInt = Int(round(progressPercentDouble * 100))
         factValueLabel.text = "\(task.factValue)"
         planValueLabel.text = "\(task.planValue)"
-        
-        progressLabel.text = "XXX %"
+        progressLabel.text = Arrow.neutral.rawValue
+        progressPercentLabel.text = "(\(progressPercentInt)%)"
         
         // Прогресс
         let progress = Double(task.planValue > 0 ? task.factValue : 0) / Double(task.planValue)
@@ -148,37 +163,74 @@ class TasksTableViewCell: UITableViewCell {
         
         switch task.status {
         case TaskStatus.created.rawValue:
-            contentView.backgroundColor = UIColor.systemGray.withAlphaComponent(0.5)
+            contentView.backgroundColor = UIColor.white.withAlphaComponent(0.10)
         case TaskStatus.launched.rawValue:
-            contentView.backgroundColor = UIColor.systemGreen.withAlphaComponent(0.2)
+            contentView.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.10)
         case TaskStatus.run.rawValue:
-            contentView.backgroundColor = UIColor.systemGreen.withAlphaComponent(0.2)
+            contentView.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.10)
         case TaskStatus.stopped.rawValue:
-            contentView.backgroundColor = UIColor.systemOrange.withAlphaComponent(0.3)
+            contentView.backgroundColor = UIColor.gray.withAlphaComponent(0.10)
         default:
             contentView.backgroundColor = .white
         }
         
+        switch statusLabel.text {
+        case TaskStatus.created.rawValue:
+            statusLabel.textColor = UIColor.black
+        case TaskStatus.run.rawValue, TaskStatus.launched.rawValue:
+            statusLabel.textColor = UIColor.systemBlue
+        case TaskStatus.stopped.rawValue:
+            statusLabel.textColor = .darkGray
+        case TaskStatus.completed.rawValue:
+            statusLabel.textColor = UIColor.systemBlue
+        default:
+            statusLabel.textColor = .red
+        }
     }
     
+    
+    
+    // Функция обновляет цвет progressBar в зависимости от движения баллов, зеленый - баллы нарастают, желтый - баллы убывают, красный - баллы меньше нуля.
     private func updateProgressAppearance(for task: Task) {
-        let plan = max(task.planValue, 1) // чтобы избежать деления на ноль
-        let progressValue = max(0.0, min(1.0, Double(task.factValue) / Double(plan)))
-        progressView.progress = Float(progressValue)
-        
-        // цвет в зависимости от условий
-        if task.factValue < 0 {
-            progressView.progressTintColor = .red
-            progressView.trackTintColor = .red.withAlphaComponent(0.3)
-        } else if progressValue < 0.25 {
-            progressView.progressTintColor = .gray
-            progressView.trackTintColor = UIColor.gray.withAlphaComponent(0.2)
-        } else if progressValue < 0.75 {
-            progressView.progressTintColor = .yellow
-            progressView.trackTintColor = UIColor.yellow.withAlphaComponent(0.2)
+
+        let plan = max(task.planValue, 1)
+
+        let now = Date()
+        let deltaSec = now.timeIntervalSince(task.date ?? now)
+      
+        let deltaInHours = deltaSec / 3600    // УСКОРЕНИЕ 60 /3600 - нормальное значение
+        let planHours = Double(plan) // УСКОРЕНИЕ: -23.5, НОРМА: БЕЗ ДОПОЛНЕНИЯ
+      
+
+        var color: UIColor = .lightGray
+        var trackColor: UIColor = UIColor.lightGray.withAlphaComponent(0.2)
+
+        if task.status == TaskStatus.created.rawValue || task.status == TaskStatus.stopped.rawValue || task.status == TaskStatus.completed.rawValue {
+            color = .lightGray
+            trackColor = UIColor.lightGray.withAlphaComponent(0.2)
+            progressLabel.text = Arrow.neutral.rawValue
         } else {
-            progressView.progressTintColor = .green
-            progressView.trackTintColor = UIColor.green.withAlphaComponent(0.2)
+            if deltaInHours <= planHours {
+                color = UIColor.systemBlue
+                trackColor = UIColor.systemBlue.withAlphaComponent(0.2)
+                progressLabel.text = Arrow.forward.rawValue
+                progressLabel.textColor = UIColor.systemBlue.withAlphaComponent(1.0)
+            } else {
+                if deltaInHours >= planHours * 2 {
+                    color = .red
+                    trackColor = UIColor.red.withAlphaComponent(0.2)
+                    progressLabel.text = Arrow.backward.rawValue
+                    progressLabel.textColor = UIColor.red.withAlphaComponent(0.2)
+                } else {
+                    color = darkYellow
+                    trackColor = darkYellow.withAlphaComponent(0.2)
+                    progressLabel.text = Arrow.backward.rawValue
+                    progressLabel.textColor = darkYellow.withAlphaComponent(0.2)
+                }
+            }
         }
+
+        progressView.progressTintColor = color
+        progressView.trackTintColor = trackColor
     }
 }

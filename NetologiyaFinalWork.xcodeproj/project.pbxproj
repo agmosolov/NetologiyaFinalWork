@@ -20,6 +20,7 @@
 		6D5B28BC2EDF8255000828F7 /* TaskCoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5B28BB2EDF8255000828F7 /* TaskCoreDataManager.swift */; };
 		6D5B28BE2EDF869E000828F7 /* TasksTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5B28BD2EDF869E000828F7 /* TasksTableViewCell.swift */; };
 		6D5B28C02EDF98AD000828F7 /* Cyclicality.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5B28BF2EDF98AD000828F7 /* Cyclicality.swift */; };
+		6DC3436F2EEB668700BC90F7 /* Arrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC3436E2EEB668700BC90F7 /* Arrow.swift */; };
 		6DD6E6B52EDF6D60009FE629 /* TasksTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD6E6B42EDF6D60009FE629 /* TasksTableViewController.swift */; };
 		6DD6E6B72EDF6D6E009FE629 /* SettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD6E6B62EDF6D6E009FE629 /* SettingsTableViewController.swift */; };
 		6DD6E6C42EDF7B55009FE629 /* CoreDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6DD6E6C22EDF7B55009FE629 /* CoreDataModel.xcdatamodeld */; };
@@ -44,6 +45,7 @@
 		6D5B28BD2EDF869E000828F7 /* TasksTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksTableViewCell.swift; sourceTree = "<group>"; };
 		6D5B28BF2EDF98AD000828F7 /* Cyclicality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cyclicality.swift; sourceTree = "<group>"; };
 		6D5B28C12EDF99A3000828F7 /* DEVELOPMEN PLAN.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "DEVELOPMEN PLAN.md"; sourceTree = "<group>"; };
+		6DC3436E2EEB668700BC90F7 /* Arrow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Arrow.swift; sourceTree = "<group>"; };
 		6DD6E6B42EDF6D60009FE629 /* TasksTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksTableViewController.swift; sourceTree = "<group>"; };
 		6DD6E6B62EDF6D6E009FE629 /* SettingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewController.swift; sourceTree = "<group>"; };
 		6DD6E6C32EDF7B55009FE629 /* CoreDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataModel.xcdatamodel; sourceTree = "<group>"; };
@@ -155,6 +157,7 @@
 				6D5B28BF2EDF98AD000828F7 /* Cyclicality.swift */,
 				6D30B9F62EE3874500BFCF8B /* TaskStatus.swift */,
 				6D30B9F82EE3875500BFCF8B /* PlanValueForCyclecycle.swift */,
+				6DC3436E2EEB668700BC90F7 /* Arrow.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -235,6 +238,7 @@
 				6D0C8F942EDDF9BD00159A45 /* AppDelegate.swift in Sources */,
 				6DD6E6B52EDF6D60009FE629 /* TasksTableViewController.swift in Sources */,
 				6DD6E6C42EDF7B55009FE629 /* CoreDataModel.xcdatamodeld in Sources */,
+				6DC3436F2EEB668700BC90F7 /* Arrow.swift in Sources */,
 				6D30B9F72EE3874500BFCF8B /* TaskStatus.swift in Sources */,
 				6D30B9FB2EE390FD00BFCF8B /* TaskLogTableViewCell.swift in Sources */,
 				6D5B28C02EDF98AD000828F7 /* Cyclicality.swift in Sources */,

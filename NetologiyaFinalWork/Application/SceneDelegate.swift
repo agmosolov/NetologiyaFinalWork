@@ -28,7 +28,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let taskTVC = TasksTableViewController()
         let taskNav = UINavigationController(rootViewController: taskTVC)
         taskNav.tabBarItem = UITabBarItem(title: "Задачи", 
-                                            image: UIImage(systemName: "target"),
+                                            image: UIImage(systemName: "flag"),
                                             tag: 1)
         
         // Третий экран: TaskLogsTableViewController

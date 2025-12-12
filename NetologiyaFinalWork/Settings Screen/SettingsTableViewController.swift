@@ -31,9 +31,8 @@ class SettingsTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Настройки"
-        // регистрируем базовую ячейку
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+ 
+        
         setupUI()
         loadSettingsDefaults()
         updateSaveButtonState()
@@ -43,14 +42,28 @@ class SettingsTableViewController: UITableViewController {
     
     private func setupUI() {
         view.backgroundColor = .systemBackground
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .always
+        title = "Настройки"
+        navigationController?.navigationBar.largeTitleTextAttributes = [.foregroundColor: UIColor.black]
+        
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         
         // кнопка сохранения в navigation bar
-        saveButton = UIBarButtonItem(title: "Сохранить", style: .done, target: self, action: #selector(saveSettingsButtonTapped))
+        saveButton = UIBarButtonItem(
+            title: "Сохранить",
+            style: .done,
+            target: self,
+            action: #selector(saveSettingsButtonTapped))
         saveButton.isEnabled = false
+        
         navigationItem.rightBarButtonItem = saveButton
         
         // левая кнопка возврата
-        backButton = UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector(backButtonTapped))
+        backButton = UIBarButtonItem(
+            barButtonSystemItem: .close,
+            target: self,
+            action: #selector(backButtonTapped))
         navigationItem.leftBarButtonItem = backButton
         
         // скрыть клавиатуру по тапу на фон
@@ -65,6 +78,7 @@ class SettingsTableViewController: UITableViewController {
             tf.textAlignment = .center
             let fontSize = tf.font?.pointSize ?? 10
             tf.font = .systemFont(ofSize: fontSize, weight: .bold)
+            tf.textColor = .systemBlue
             tf.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
             tf.delegate = self
         }
@@ -140,8 +154,8 @@ class SettingsTableViewController: UITableViewController {
         
         let label = UILabel()
         label.text = "Достижения"
-        label.font = UIFont.systemFont(ofSize: 35, weight: .bold)
-        label.textColor = .darkGray
+        label.font = UIFont.systemFont(ofSize: 25, weight: .bold)
+        label.textColor = .lightGray
         label.translatesAutoresizingMaskIntoConstraints = false
 
         footer.addSubview(label)

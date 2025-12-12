@@ -31,7 +31,8 @@ class TaskLogsTableViewController: UITableViewController {
         
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always // или .automatic
-        title = "Журнал"
+        title = "История"
+        navigationController?.navigationBar.largeTitleTextAttributes = [.foregroundColor: UIColor.black]
         
         // Добавил кнопку удаления (корзины)
         let deleteTaskBarButton =
