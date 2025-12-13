@@ -208,7 +208,7 @@ class TasksTableViewCell: UITableViewCell {
         let now = Date()
         let deltaSec = now.timeIntervalSince(task.date ?? now)
       
-        let deltaInHours = deltaSec / 3600    // УСКОРЕНИЕ 60 /3600 - нормальное значение
+        let deltaInHours = deltaSec / 5    // УСКОРЕНИЕ 60 /3600 - нормальное значение
         let planHours = Double(plan) // УСКОРЕНИЕ: -23.5, НОРМА: БЕЗ ДОПОЛНЕНИЯ
       
 

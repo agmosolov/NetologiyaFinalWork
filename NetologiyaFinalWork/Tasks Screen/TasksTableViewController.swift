@@ -114,7 +114,7 @@ class TasksTableViewController: UITableViewController {
     
     // Установка таймера в секундах (УСКОРЕНИЕ)
     private func startTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: 60.0, repeats: true) { [weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
             self?.updateFactValueForAllTasks()
         }
     }
@@ -649,7 +649,7 @@ class TasksTableViewController: UITableViewController {
         if (task.status != nil) {
             let now = Date()
             let diffSec = now.timeIntervalSince(taskDate)
-            let hours = Int64(diffSec / 3600) // УСКОРЕНИЕ 60 - минуты, 3600 - часы
+            let hours = Int64(diffSec / 5) // УСКОРЕНИЕ 60 - минуты, 3600 - часы
             
             let plan = task.planValue
             

@@ -123,6 +123,7 @@ class TaskLogTableViewCell: UITableViewCell {
             contentView.backgroundColor = UIColor.gray.withAlphaComponent(0.1)
             taskNameLabel.textColor = .brown
             statusLabel.textColor = .brown
+            progressPercentLabel.text = "(-)"
         default:
             contentView.backgroundColor = .white
         }
