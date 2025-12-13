@@ -16,6 +16,8 @@ class TasksTableViewController: UITableViewController {
     private var originalTaskName: String?
     private var isAlphabetSortEnabled = false
     private var complexAlphabetSortEnabled = false
+    private var isManualSortEnabled = false
+    var isEditingActive = false
     
     var editOrderButton: UIBarButtonItem!
     var addNewTaskBarButton: UIBarButtonItem!
@@ -61,7 +63,14 @@ class TasksTableViewController: UITableViewController {
                         action: #selector(didTapAddNewTaskBarButton))
         addNewTaskBarButton.tintColor = .systemBlue
         
-        navigationItem.rightBarButtonItem = addNewTaskBarButton
+        sortComplexButton = UIBarButtonItem(
+            image: UIImage(systemName: "tray.2"),
+            style: .plain,
+            target: self,
+            action: #selector(sortByComplexAlphabet))
+        sortComplexButton.tintColor = .systemBlue
+        
+        
         
         sortByAlphaButton = UIBarButtonItem(
             image: UIImage(systemName: "textformat.abc"),
@@ -80,14 +89,8 @@ class TasksTableViewController: UITableViewController {
         editOrderButton.tintColor = .black
         
         
-        sortComplexButton = UIBarButtonItem(
-            image: UIImage(systemName: "tray.2"),
-            style: .plain,
-            target: self,
-            action: #selector(sortByComplexAlphabet))
-        sortComplexButton.tintColor = .systemBlue
-    
-            navigationItem.leftBarButtonItems = [editOrderButton, sortByAlphaButton, sortComplexButton]
+        navigationItem.leftBarButtonItems = [sortByAlphaButton, sortComplexButton]
+        navigationItem.rightBarButtonItems = [addNewTaskBarButton, editOrderButton]
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tap.cancelsTouchesInView = false
@@ -95,10 +98,13 @@ class TasksTableViewController: UITableViewController {
 
     }
     
+    
+    
     @objc private func toggleReorder() {
-        let isEditingActive = tableView.isEditing
         tableView.setEditing(!isEditingActive, animated: true)
-        editOrderButton.tintColor = isEditingActive ? .black : .systemBlue
+        isEditingActive = tableView.isEditing
+        editOrderButton.tintColor = isEditingActive ? .systemBlue : .black
+        tableView.reloadData()
     }
     
     @objc private func dismissKeyboard() {
@@ -294,7 +300,7 @@ class TasksTableViewController: UITableViewController {
         
         let alert = UIAlertController(title: "Выберете действие",
                                       message: nil,
-                                      preferredStyle: .alert)
+                                      preferredStyle: .actionSheet)
         
         // Выполнить
         alert.addAction(UIAlertAction(title: "Выполнить",
@@ -755,14 +761,15 @@ class TasksTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "TaskTableViewCell",
-                                                       for: indexPath) as? TasksTableViewCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "TaskTableViewCell", for: indexPath) as? TasksTableViewCell else {
             return UITableViewCell(style: .default, reuseIdentifier: "TaskTableViewCell")
         }
         let task = tasks[indexPath.row]
-        cell.configure(with: task)
+        cell.configure(with: task, hideLabels: isEditingActive)
         return cell
     }
+
+    
     
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return true
@@ -781,8 +788,8 @@ class TasksTableViewController: UITableViewController {
     private func confirmDeleteTaskAndAllLogs(for indexPath: IndexPath) {
         let task = tasks[indexPath.row]
         let alert = UIAlertController(title: "Удалить задачу и историю",
-                                      message: "Вы действительно хотите удалить  задачу \(task.taskName ?? "") и всю её историю?",
-                                      preferredStyle: .alert)
+                                      message: "Вы действительно хотите удалить \"\(task.taskName ?? "")\"\n и всю историю задачи?",
+                                      preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "Удалить", style: .destructive, handler: { [weak self] _ in
             self?.deleteAllLogs(forTaskName: task.taskName)
             self?.deleteTask(at: indexPath)

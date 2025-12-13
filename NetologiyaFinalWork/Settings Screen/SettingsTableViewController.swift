@@ -103,7 +103,7 @@ class SettingsTableViewController: UITableViewController {
     @objc private func backButtonTapped() {
         view.endEditing(true)
         loadSettingsDefaults()
-        tabBarController?.selectedIndex = 0
+        updateSaveButtonState()
     }
     
     @objc private func textFieldDidChange( textField: UITextField) {
@@ -155,7 +155,7 @@ class SettingsTableViewController: UITableViewController {
         let label = UILabel()
         label.text = "Достижения"
         label.font = UIFont.systemFont(ofSize: 25, weight: .bold)
-        label.textColor = .lightGray
+        label.textColor = .systemBlue.withAlphaComponent(1.0)
         label.translatesAutoresizingMaskIntoConstraints = false
 
         footer.addSubview(label)
@@ -181,7 +181,7 @@ class SettingsTableViewController: UITableViewController {
         let label = UILabel()
         label.text = "Установите пороговые значения для достижений и сохраните изменения."
         label.font = UIFont.systemFont(ofSize: 12)
-        label.textColor = .secondaryLabel
+        label.textColor = UIColor.systemBlue.withAlphaComponent(0.75)
         label.lineBreakMode = .byWordWrapping
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -235,7 +235,6 @@ class SettingsTableViewController: UITableViewController {
         loadSettingsDefaults()
         NotificationCenter.default.post(name: NSNotification.Name("SettingsDidChange"), object: nil)
         updateSaveButtonState()
-        tabBarController?.selectedIndex = 0
     }
     
     

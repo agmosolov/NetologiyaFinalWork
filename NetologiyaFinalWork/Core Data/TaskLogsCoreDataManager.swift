@@ -41,6 +41,7 @@ final class TaskLogsCoreDataManager {
         log.factValue = task.factValue
         log.planValue = task.planValue
         log.status = task.status
+        log.orderIndex = task.orderIndex
         saveContext()
     }
     
@@ -56,6 +57,8 @@ final class TaskLogsCoreDataManager {
             return []
         }
     }
+    
+    
     
     func deleteAllLogs() {
         let req: NSFetchRequest<TaskLog> = TaskLog.fetchRequest()

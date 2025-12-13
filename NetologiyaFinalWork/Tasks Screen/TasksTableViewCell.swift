@@ -69,8 +69,8 @@ class TasksTableViewCell: UITableViewCell {
             taskNameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
             taskNameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
             
-            cyclicalityLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
-            cyclicalityLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
+            statusLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
+            statusLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
             
             progressLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
             
@@ -80,8 +80,8 @@ class TasksTableViewCell: UITableViewCell {
             
             progressLabel.centerYAnchor.constraint(equalTo: progressView.centerYAnchor),
             
-            statusLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: padding),
-            statusLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
+            cyclicalityLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: padding),
+            cyclicalityLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
             
             dateLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: padding),
             dateLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
@@ -111,7 +111,7 @@ class TasksTableViewCell: UITableViewCell {
         taskNameLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         dateLabel.font = UIFont.systemFont(ofSize: 10)
         statusLabel.font = UIFont.systemFont(ofSize: 10, weight: .bold)
-        cyclicalityLabel.font = UIFont.systemFont(ofSize: 10, weight: .bold)
+        cyclicalityLabel.font = UIFont.systemFont(ofSize: 10)
         planValueLabel.font = UIFont.systemFont(ofSize: 10)
         factValueLabel.font = UIFont.systemFont(ofSize: 10)
         earnedLabel.font = UIFont.systemFont(ofSize: 10)
@@ -128,7 +128,13 @@ class TasksTableViewCell: UITableViewCell {
         dateLabel.text = formatter.string(from: date)
     }
     
-    func configure(with task: Task) {
+    func configure(with task: Task, hideLabels: Bool) {
+        earnedLabel.isHidden = hideLabels
+        factValueLabel.isHidden = hideLabels
+        fromLabel.isHidden = hideLabels
+        planValueLabel.isHidden = hideLabels
+        progressPercentLabel.isHidden = hideLabels
+        cyclicalityLabel.isHidden = hideLabels
         taskNameLabel.text = task.taskName
         statusLabel.text = task.status
         if let date = task.date {
@@ -176,13 +182,17 @@ class TasksTableViewCell: UITableViewCell {
         
         switch statusLabel.text {
         case TaskStatus.created.rawValue:
-            statusLabel.textColor = UIColor.black
+            statusLabel.textColor = .black
+            taskNameLabel.textColor = .black
         case TaskStatus.run.rawValue, TaskStatus.launched.rawValue:
-            statusLabel.textColor = UIColor.systemBlue
+            statusLabel.textColor = .systemBlue
+            taskNameLabel.textColor = .systemBlue
         case TaskStatus.stopped.rawValue:
-            statusLabel.textColor = .darkGray
+            statusLabel.textColor = .brown
+            taskNameLabel.textColor = .brown
         case TaskStatus.completed.rawValue:
-            statusLabel.textColor = UIColor.systemBlue
+            statusLabel.textColor = .systemBlue
+            taskNameLabel.textColor = .systemBlue
         default:
             statusLabel.textColor = .red
         }
@@ -214,18 +224,15 @@ class TasksTableViewCell: UITableViewCell {
                 color = UIColor.systemBlue
                 trackColor = UIColor.systemBlue.withAlphaComponent(0.2)
                 progressLabel.text = Arrow.forward.rawValue
-                progressLabel.textColor = UIColor.systemBlue.withAlphaComponent(1.0)
             } else {
                 if deltaInHours >= planHours * 2 {
                     color = .red
                     trackColor = UIColor.red.withAlphaComponent(0.2)
                     progressLabel.text = Arrow.backward.rawValue
-                    progressLabel.textColor = UIColor.red.withAlphaComponent(0.2)
                 } else {
                     color = darkYellow
                     trackColor = darkYellow.withAlphaComponent(0.2)
                     progressLabel.text = Arrow.backward.rawValue
-                    progressLabel.textColor = darkYellow.withAlphaComponent(0.2)
                 }
             }
         }

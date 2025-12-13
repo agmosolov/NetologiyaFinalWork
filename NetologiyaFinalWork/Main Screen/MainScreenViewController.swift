@@ -89,10 +89,6 @@ class MainScreenViewController: UIViewController {
     
     let bottomMainStack = UIStackView()
     let bottomMainRowStack = UIStackView()
-    private let dateFromPicker = UIDatePicker()
-    private let dateToPicker = UIDatePicker()
-    private var dateFrom: Date?
-    private var dateTo: Date?
     
     var batteryTitle = UILabel()
     var batteryLabel = UILabel()
@@ -118,6 +114,8 @@ class MainScreenViewController: UIViewController {
     private var currentIndex: Int = 0
     private lazy var batteryLevels: [UIView] = [batteryLevel10, batteryLevel9, batteryLevel8, batteryLevel7, batteryLevel6, batteryLevel5, batteryLevel4, batteryLevel3, batteryLevel2, batteryLevel1]
     
+    private var isAnimating = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -138,6 +136,7 @@ class MainScreenViewController: UIViewController {
         loadSettingsFromDefaults()
         updateAllStats()
         updateAllAchievements()
+        updateBatteryDisplay(percent: calculateRegimeCompliance())
     }
     
     @objc private func settingsChanged() {
@@ -196,14 +195,17 @@ class MainScreenViewController: UIViewController {
         return result
     }
     
+
     
     private func updateBatteryDisplay(percent: Double) {
         let clamped = max(0.0, min(1.0, percent))
-        if percent < 0 {
-            // не окрашиваем: можно вернуть/обнулить все
-            batteryLevels.forEach { $0.backgroundColor = .lightGray }
+        // если новая величина не выше текущего прогресса, выход
+        let currentProgress = Double(currentIndex) / 10.0
+        if clamped <= currentProgress {
             return
         }
+
+        // вычисляем целевое количество уровней
         let filled = filledLevelsCount(for: clamped)
         targetFilled = filled
         currentIndex = 0
@@ -211,13 +213,14 @@ class MainScreenViewController: UIViewController {
         fillTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] t in
             guard let self = self else { t.invalidate(); return }
             if self.currentIndex < self.targetFilled {
-                self.batteryLevels[self.currentIndex].backgroundColor = .green
+                self.batteryLevels[self.currentIndex].backgroundColor = .systemBlue.withAlphaComponent(0.5)
                 self.currentIndex += 1
             } else {
                 t.invalidate()
             }
         }
     }
+    
 
     private func filledLevelsCount(for percent: Double) -> Int {
         let p = max(0.0, min(1.0, percent))
@@ -474,12 +477,6 @@ class MainScreenViewController: UIViewController {
             a.layer.shadowOffset = CGSize(width: 5, height: 5)
         }
         
-        dateFromPicker.datePickerMode = .date
-        dateToPicker.datePickerMode = .date
-        dateFromPicker.preferredDatePickerStyle = .wheels
-        dateToPicker.preferredDatePickerStyle = .compact
-        dateFromPicker.translatesAutoresizingMaskIntoConstraints = false
-        dateToPicker.translatesAutoresizingMaskIntoConstraints = false
         
         let stacks = [rootStack, upperMainStack, activeTasksStack, midleMainStack, achievmentsStack, batteryStack, batterySubStack1, batterySubStack2, batteryWhiteStack1, batteryWhiteStack2, bottomMainStack, completedTasksStack, collectedPointsStack, upperToMidleMainWhiteStack, middleToBottomMainWhiteStack, whiteStackForMidleMainStack, achievment1Stack, achievment2Stack, achievment3Stack, achievment4Stack, achievment5Stack, achievmentVerSubStack1, achievmentVerSubStack2, achievmentVerSubStack3, achievmentVerSubStack4, achievmentVerSubStack5]
         for s in stacks {
@@ -607,8 +604,6 @@ class MainScreenViewController: UIViewController {
         batterySubStack1.addArrangedSubview(batteryWhiteElement3)
         
         bottomMainStack.addArrangedSubview(bottomMainRowStack)
-        bottomMainRowStack.addArrangedSubview(dateFromPicker)
-        bottomMainRowStack.addArrangedSubview(dateToPicker)
         
         batteryElement1.backgroundColor = .darkGray
         batteryElement2.backgroundColor = .darkGray
