@@ -8,10 +8,12 @@
 import CoreData
 
 final class TaskLogsCoreDataManager {
+    
     static let shared = TaskLogsCoreDataManager()
     
     private let modelName = "CoreDataModel"
     private init() {}
+    
     
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: modelName)
@@ -23,7 +25,9 @@ final class TaskLogsCoreDataManager {
         return container
     }()
     
+   
     var viewContext: NSManagedObjectContext { persistentContainer.viewContext }
+    
     
     func saveContext() {
         let ctx = viewContext
@@ -32,7 +36,7 @@ final class TaskLogsCoreDataManager {
         }
     }
     
-    // TaskLog specific helpers
+
     func createLog(from task: Task) {
         let log = TaskLog(context: viewContext)
         log.taskName = task.taskName
@@ -44,6 +48,7 @@ final class TaskLogsCoreDataManager {
         log.orderIndex = task.orderIndex
         saveContext()
     }
+    
     
     func fetchLogs(predicate: NSPredicate? = nil,
                    sortDescriptors: [NSSortDescriptor]? = nil) -> [TaskLog] {
@@ -59,9 +64,10 @@ final class TaskLogsCoreDataManager {
     }
     
     
-    
     func deleteAllLogs() {
+        
         let req: NSFetchRequest<TaskLog> = TaskLog.fetchRequest()
+        
         do {
             let logs = try viewContext.fetch(req)
             for log in logs {
@@ -73,30 +79,36 @@ final class TaskLogsCoreDataManager {
         }
     }
     
+    
     func countLogs(withStatuses statuses: [String]) -> Int {
-            let ctx = viewContext
-            let request: NSFetchRequest<TaskLog> = TaskLog.fetchRequest()
-            let pred = NSPredicate(format: "status IN %@", statuses)
-            request.predicate = pred
-            do {
-                let logs = try ctx.fetch(request)
-                return logs.count
-            } catch {
-                print("!!!Fetch logs error: \(error)")
-                return 0
-            }
+        
+        let ctx = viewContext
+        let request: NSFetchRequest<TaskLog> = TaskLog.fetchRequest()
+        let pred = NSPredicate(format: "status IN %@", statuses)
+        request.predicate = pred
+        
+        do {
+            let logs = try ctx.fetch(request)
+            return logs.count
+        } catch {
+            print("!!!Fetch logs error: \(error)")
+            return 0
         }
+    }
+    
     
     func sumFactAndPlanValues() -> (sumFact: Int, sumPlan: Int) {
-            let req: NSFetchRequest<TaskLog> = TaskLog.fetchRequest()
-            do {
-                let logs = try viewContext.fetch(req)
-                let sumFact = logs.reduce(0) { $0 + Int($1.factValue) }
-                let sumPlan = logs.reduce(0) { $0 + Int($1.planValue) }
-                return (sumFact, sumPlan)
-            } catch {
-                print("!!!Fetch logs error: \(error)")
-                return (0, 0)
-            }
+        
+        let req: NSFetchRequest<TaskLog> = TaskLog.fetchRequest()
+        
+        do {
+            let logs = try viewContext.fetch(req)
+            let sumFact = logs.reduce(0) { $0 + Int($1.factValue) }
+            let sumPlan = logs.reduce(0) { $0 + Int($1.planValue) }
+            return (sumFact, sumPlan)
+        } catch {
+            print("!!!Fetch logs error: \(error)")
+            return (0, 0)
         }
+    }
 }

@@ -16,8 +16,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         window = UIWindow(windowScene: windowScene)
-        
        
+        
         let mainScreenVC = MainScreenViewController()
         let mainScreenNav = UINavigationController(rootViewController: mainScreenVC)
         mainScreenNav.tabBarItem = UITabBarItem(title: "Главная", 
@@ -31,11 +31,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                                             image: UIImage(systemName: "flag"),
                                             tag: 1)
         
-        
+    
         let logsTVC = TaskLogsTableViewController()
         let logsNav = UINavigationController(rootViewController: logsTVC)
         logsNav.tabBarItem = UITabBarItem(title: "Журнал", image: UIImage(systemName: "list.dash"), tag: 2)
-        
         
 
         let settingsTVC = SettingsTableViewController()
@@ -44,7 +43,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                                             image: UIImage(systemName: "gear"),
                                             tag: 3)
         
-        
       
         let tabBarController = UITabBarController()
         tabBarController.viewControllers = [mainScreenNav, taskNav, logsNav, settingsNav]
@@ -52,27 +50,5 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.rootViewController = tabBarController
         window?.makeKeyAndVisible()
     }
-    
-    func sceneDidDisconnect(_ scene: UIScene) {
-        
-    }
-    
-    func sceneDidBecomeActive(_ scene: UIScene) {
-        
-    }
-    
-    func sceneWillResignActive(_ scene: UIScene) {
-        
-    }
-    
-    func sceneWillEnterForeground(_ scene: UIScene) {
-        
-    }
-    
-    func sceneDidEnterBackground(_ scene: UIScene) {
-        
-    }
-    
-    
 }
 

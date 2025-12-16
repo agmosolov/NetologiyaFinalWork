@@ -8,32 +8,32 @@
 import UIKit
 import CoreData
 
+
+
 class MainScreenViewController: UIViewController {
-    
     
     let rootStack = UIStackView()
     
     let upperMainStack = UIStackView()
-    let upperMainWhiteStack1 = UIStackView()
-    let upperMainWhiteStack2 = UIStackView()
+    let upperMainWhiteSubStackLeft = UIStackView()
+    let upperMainWhiteSubStackRight = UIStackView()
     
     let activeTasksStack = UIStackView()
     let activeTasksTitle = UILabel()
     let activeTasksLabel = UILabel()
-    let whiteStackForActiveTasksStack = UIStackView()
+    let activeTasksWhiteStack = UIStackView()
     
     let completedTasksStack = UIStackView()
     let completedTasksTitle = UILabel()
     let completedTasksLabel = UILabel()
-    let whiteStackForCompletedTaskStack = UIStackView()
+    let completedTasksWhiteStack = UIStackView()
     
     let collectedPointsStack = UIStackView()
     let collectedPointsTitle = UILabel()
     let collectedPointsLabel = UILabel()
-    let whiteStackForCollectedPointsStack = UIStackView()
+    let collectedPointsWhiteStack = UIStackView()
     
     let upperToMidleMainWhiteStack = UIStackView()
-    let middleToBottomWhiteStack = UIStackView()
     
     let midleMainStack = UIStackView()
     let achievmentsStack = UIStackView()
@@ -119,6 +119,8 @@ class MainScreenViewController: UIViewController {
     let batteryLevel9 = UIView()
     let batteryLevel10 = UIView()
     
+    let middleToBottomWhiteStack = UIStackView()
+    
     private var fillTimer: Timer?
     private var targetFilled: Int = 0
     private var currentIndex: Int = 0
@@ -128,20 +130,13 @@ class MainScreenViewController: UIViewController {
     
     private var isAnimating = false
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         updateAllStats()
         updateAllAchievements()
-        
-        NotificationCenter.default.addObserver(self,
-                    selector: #selector(settingsChanged),
-                    name: NSNotification.Name("SettingsDidChange"),
-                    object: nil)
-        
-        
     }
-    
     
     
     override func viewWillAppear(_ animated: Bool) {
@@ -150,23 +145,11 @@ class MainScreenViewController: UIViewController {
         updateAllAchievements()
         updateBatteryDisplay(percent: calculateRegimeCompliance())
     }
-    
-    @objc private func settingsChanged() {
-        DispatchQueue.main.async {
-            self.loadSettingsFromDefaults()
-            self.updateAllStats()
-            self.updateAllAchievements()
-        }
-    }
-    deinit {
-            NotificationCenter.default.removeObserver(self, name: NSNotification.Name("SettingsDidChange"), object: nil)
-        }
 
     
-    
-    
+    // Обновить все статусы
     private func updateAllStats() {
-        activeTasksLabel.text = String(fetchNumbersOfTaskWithSpecialStatus().active)
+        activeTasksLabel.text = String(fetchNumbersOfActiveTasks().active)
         completedTasksLabel.text = String(fetchNumbersOfCompletedTaskLogs())
         collectedPointsLabel.text = String(fetchSumFactAndPlanTaskLogs().sumFact)
         batteryLabel.text = updateRegimeComplianceLabel().forLabel
@@ -174,7 +157,8 @@ class MainScreenViewController: UIViewController {
     }
     
     
-    private func fetchNumbersOfTaskWithSpecialStatus() -> (total: Int, active: Int, inactive: Int) {
+    // Получить количество активных задач
+    private func fetchNumbersOfActiveTasks() -> (total: Int, active: Int, inactive: Int) {
         let ctx = TaskCoreDataManager.shared.viewContext
         let req: NSFetchRequest<Task> = Task.fetchRequest()
         do {
@@ -189,16 +173,20 @@ class MainScreenViewController: UIViewController {
         }
     }
     
+    
+    // Получить количество повторений по логам
     private func fetchNumbersOfCompletedTaskLogs() -> Int {
-        // используем ваш TaskLogsCoreDataManager
         return TaskLogsCoreDataManager.shared.countLogs(withStatuses: [TaskStatus.launched.rawValue, TaskStatus.run.rawValue, TaskStatus.completed.rawValue])
     }
     
+    
+    // Получить сумму плана и факта по логам
     private func fetchSumFactAndPlanTaskLogs() -> (sumFact: Int, sumPlan: Int) {
         return TaskLogsCoreDataManager.shared.sumFactAndPlanValues()
     }
     
     
+    // Получить % режима
     private func calculateRegimeCompliance() -> Double {
         let sums = fetchSumFactAndPlanTaskLogs()
         guard sums.sumPlan != 0 else { return 0.0 }
@@ -207,54 +195,27 @@ class MainScreenViewController: UIViewController {
         return result
     }
     
-
     
-//    private func updateBatteryDisplay(percent: Double) {
-//        let clamped = max(0.0, min(1.0, percent))
-//        // если новая величина не выше текущего прогресса, выход
-//        let currentProgress = Double(currentIndex) / 10.0
-//        if clamped <= currentProgress {
-//            return
-//        }
-//
-//        // вычисляем целевое количество уровней
-//        let filled = filledLevelsCount(for: clamped)
-//        targetFilled = filled
-//        currentIndex = 0
-//        fillTimer?.invalidate()
-//        fillTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] t in
-//            guard let self = self else { t.invalidate(); return }
-//            if self.currentIndex < self.targetFilled {
-//                self.batteryLevels[self.currentIndex].backgroundColor = .systemBlue.withAlphaComponent(0.5)
-//                self.currentIndex += 1
-//            } else {
-//                t.invalidate()
-//            }
-//        }
-//    }
-    
+    // Логика анимации заряда батареи
     private func updateBatteryDisplay(percent: Double) {
         let clamped = max(0.0, min(1.0, percent))
-        // текущее значение по индексу
         
-        // целевой уровень
         let newTarget = filledLevelsCount(for: clamped)
 
-        // если новая цель та же, выходим
         if newTarget == currentIndex { return }
 
-        // если цель выше — анимация вверх
         if newTarget > currentIndex {
             targetFilled = newTarget
             startAnimation(upward: true)
             return
         }
 
-        // если цель ниже — анимация вниз (закрашиваем серым)
         targetFilled = newTarget
         startAnimation(upward: false)
     }
     
+    
+    // Анимация закрашивания элементов батарейки
     private func startAnimation(upward: Bool) {
         fillTimer?.invalidate()
         fillTimer = Timer.scheduledTimer(withTimeInterval: stepInterval, repeats: true) { [weak self] t in
@@ -294,17 +255,22 @@ class MainScreenViewController: UIViewController {
     }
     
 
+    // Вспомогательная функция к отображению заряда батареи на базе % режима
     private func filledLevelsCount(for percent: Double) -> Int {
         let p = max(0.0, min(1.0, percent))
         return Int(ceil(p * 10.0))
     }
     
+    
+    // Обновление % режима
     private func updateRegimeComplianceLabel() -> (forLabel: String, forCalculation: Int) {
         let resultInt = Int(round(calculateRegimeCompliance() * 100))
         let resultString = "\(resultInt)%"
         return (resultString, resultInt)
     }
     
+    
+    // Загрузка данных из UserDefaults
     private func loadSettingsFromDefaults() {
         let defaults = UserDefaults.standard
         activeTasksToWin = defaults.integer(forKey: "activeTasksToWin")
@@ -314,8 +280,8 @@ class MainScreenViewController: UIViewController {
         countOfAchievmentsToWin = defaults.integer(forKey: "countOfAchievmentsToWin")
     }
     
-    //MARK: - Achievments
     
+    // Проверка всех достижений
     private func updateAllAchievements() {
         checkActiveTasksToWin()
         checkCompletedTasks()
@@ -325,9 +291,11 @@ class MainScreenViewController: UIViewController {
         updateAchievmentLabels()
     }
     
+    
+    // Проверка достижения по активным задачам
     private func checkActiveTasksToWin() {
         
-        let activeTasks = fetchNumbersOfTaskWithSpecialStatus().active
+        let activeTasks = fetchNumbersOfActiveTasks().active
         
         if activeTasks >= activeTasksToWin {
             achievment1View.image = UIImage(named: "ActiveTasksColor")
@@ -342,6 +310,8 @@ class MainScreenViewController: UIViewController {
         }
     }
     
+    
+    // Проверка достижения по выполненным задачам
     private func checkCompletedTasks() {
         
         let completedTasks = fetchNumbersOfCompletedTaskLogs()
@@ -359,6 +329,8 @@ class MainScreenViewController: UIViewController {
         }
     }
     
+    
+    // Проверка достижения по набранным баллам
     private func checkCollectedPoints() {
         
         let collectedPoints = fetchSumFactAndPlanTaskLogs().sumFact
@@ -376,6 +348,8 @@ class MainScreenViewController: UIViewController {
         }
     }
     
+    
+    // Проверка достижения по соблюдению режима
     private func checkRegimeCompliance() {
         let regimeCompliance = updateRegimeComplianceLabel().forCalculation
         if regimeCompliance > regimeComplianceToWin {
@@ -391,6 +365,8 @@ class MainScreenViewController: UIViewController {
         }
     }
     
+    
+    // Проверка кол-ва достижений
     private func checkCountOfAchievments() {
         
         let sum = countOfAchievments.reduce(0, +)
@@ -406,6 +382,8 @@ class MainScreenViewController: UIViewController {
         }
     }
     
+    
+    // Обновление labels достижений
     private func updateAchievmentLabels() {
         achievment1Title.text = "\(activeTasksToWin)"
         achievment2Title.text = "\(completedTasksToWin)"
@@ -414,7 +392,6 @@ class MainScreenViewController: UIViewController {
         achievment5Title.text = "Все"
     }
     
-    // MARK: - SetupUI
     
     private func setupUI() {
         
@@ -433,7 +410,7 @@ class MainScreenViewController: UIViewController {
         batteryLabel.font = UIFont.systemFont(ofSize: 20, weight: .heavy)
         batteryLabel.textColor = .systemBlue.withAlphaComponent(0.75)
         
-        activeTasksLabel.text = String(fetchNumbersOfTaskWithSpecialStatus().active)
+        activeTasksLabel.text = String(fetchNumbersOfActiveTasks().active)
         activeTasksLabel.textAlignment = .center
         activeTasksLabel.font = UIFont.systemFont(ofSize: 50, weight: .heavy)
         activeTasksLabel.textColor = .systemBlue.withAlphaComponent(0.75)
@@ -466,9 +443,9 @@ class MainScreenViewController: UIViewController {
         collectedPointsTitle.lineBreakMode = .byWordWrapping
         collectedPointsTitle.numberOfLines = 2
         
-        activeTasksToWin = 2
-        completedTasksToWin = 10
-        collectedPointsToWin = 10
+        activeTasksToWin = 10
+        completedTasksToWin = 100
+        collectedPointsToWin = 100
         regimeComplianceToWin = 75
         countOfAchievmentsToWin = 5
         countOfAchievments = [0, 0, 0, 0]
@@ -552,8 +529,7 @@ class MainScreenViewController: UIViewController {
             a.layer.shadowOffset = CGSize(width: 5, height: 5)
         }
         
-        
-        let stacks = [rootStack, upperMainStack, activeTasksStack, midleMainStack, achievmentsStack, batteryStack, batterySubStack1, batterySubStack2, batteryWhiteStack1, batteryWhiteStack2, bottomMainStack, completedTasksStack, collectedPointsStack, upperToMidleMainWhiteStack, middleToBottomMainWhiteStack, whiteStackForMidleMainStack, achievment1Stack, achievment2Stack, achievment3Stack, achievment4Stack, achievment5Stack, achievmentVerSubStack1, achievmentVerSubStack2, achievmentVerSubStack3, achievmentVerSubStack4, achievmentVerSubStack5, whiteStackForActiveTasksStack, whiteStackForCompletedTaskStack, whiteStackForCollectedPointsStack, achievmentVerSecondarySubStack, whiteStackForAchievmentStack, achievmentVerMainSubStack, achievmentVerWhiteStack]
+        let stacks = [rootStack, upperMainStack, activeTasksStack, midleMainStack, achievmentsStack, batteryStack, batterySubStack1, batterySubStack2, batteryWhiteStack1, batteryWhiteStack2, bottomMainStack, completedTasksStack, collectedPointsStack, upperToMidleMainWhiteStack, middleToBottomMainWhiteStack, whiteStackForMidleMainStack, achievment1Stack, achievment2Stack, achievment3Stack, achievment4Stack, achievment5Stack, achievmentVerSubStack1, achievmentVerSubStack2, achievmentVerSubStack3, achievmentVerSubStack4, achievmentVerSubStack5, activeTasksWhiteStack, completedTasksWhiteStack, collectedPointsWhiteStack, achievmentVerSecondarySubStack, whiteStackForAchievmentStack, achievmentVerMainSubStack, achievmentVerWhiteStack, bottomMainRowStack]
         for s in stacks {
             s.translatesAutoresizingMaskIntoConstraints = false
             s.axis = .vertical
@@ -561,47 +537,14 @@ class MainScreenViewController: UIViewController {
             s.spacing = 0
         }
         
+        [upperMainStack, batteryStack, midleMainStack, bottomMainStack, bottomMainRowStack, achievmentsStack, achievment1Stack, achievment2Stack, achievment3Stack, achievment4Stack, achievment5Stack, batterySubStack2].forEach({ $0.axis = .horizontal })
         
-        upperMainStack.axis = .horizontal
-        midleMainStack.axis = .horizontal
-        bottomMainStack.axis = .horizontal
-        bottomMainRowStack.axis = .horizontal
-        achievmentsStack.axis = .horizontal
-        achievment1Stack.axis = .horizontal
-        achievment2Stack.axis = .horizontal
-        achievment3Stack.axis = .horizontal
-        achievment4Stack.axis = .horizontal
-        achievment5Stack.axis = .horizontal
-
-        achievmentVerMainSubStack.distribution = .fill
-        achievmentVerSecondarySubStack.distribution = .fillEqually
-        achievmentsStack.distribution = .fill
-        achievment1Stack.distribution = .fill
-        achievment2Stack.distribution = .fill
-        achievment3Stack.distribution = .fill
-        achievment4Stack.distribution = .fill
-        achievment5Stack.distribution = .fill
-        achievmentVerSubStack1.distribution = .fill
-        achievmentVerSubStack2.distribution = .fill
-        achievmentVerSubStack3.distribution = .fill
-        achievmentVerSubStack4.distribution = .fill
-        achievmentVerSubStack5.distribution = .fill
-        activeTasksStack.distribution = .fill
-        completedTasksStack.distribution = .fill
-        collectedPointsStack.distribution = .fill
-        bottomMainStack.distribution = .fill
-        bottomMainRowStack.distribution = .fillEqually
-        batteryStack.axis = .horizontal
-        batteryStack.distribution = .fill
-        batterySubStack2.axis = .horizontal
-        batterySubStack2.distribution = .fill
+        [achievmentVerMainSubStack, achievmentsStack, achievment1Stack, achievment2Stack, achievment3Stack, achievment4Stack, achievment5Stack, achievmentVerSubStack1, achievmentVerSubStack2, achievmentVerSubStack3, achievmentVerSubStack4, achievmentVerSubStack5, activeTasksStack, completedTasksStack, collectedPointsStack, bottomMainStack, batteryStack, batterySubStack2].forEach({ $0.distribution = .fill })
         
         midleMainStack.spacing = 10
         bottomMainRowStack.spacing = 10
-        batteryStack.spacing = 0
         achievmentVerSecondarySubStack.spacing = 10
         achievmentsStack.spacing = 5
-        
         batterySubStack1.spacing = 0.5
         
         view.addSubview(rootStack)
@@ -612,17 +555,22 @@ class MainScreenViewController: UIViewController {
         rootStack.addArrangedSubview(bottomMainStack)
         
         upperMainStack.addArrangedSubview(activeTasksStack)
-        activeTasksStack.addArrangedSubview(whiteStackForActiveTasksStack)
+        
+        activeTasksStack.addArrangedSubview(activeTasksWhiteStack)
         activeTasksStack.addArrangedSubview(activeTasksTitle)
         activeTasksStack.addArrangedSubview(activeTasksLabel)
-        upperMainStack.addArrangedSubview(upperMainWhiteStack1)
+        
+        upperMainStack.addArrangedSubview(upperMainWhiteSubStackLeft)
         upperMainStack.addArrangedSubview(completedTasksStack)
-        completedTasksStack.addArrangedSubview(whiteStackForCompletedTaskStack)
+        
+        completedTasksStack.addArrangedSubview(completedTasksWhiteStack)
         completedTasksStack.addArrangedSubview(completedTasksTitle)
         completedTasksStack.addArrangedSubview(completedTasksLabel)
-        upperMainStack.addArrangedSubview(upperMainWhiteStack2)
+        
+        upperMainStack.addArrangedSubview(upperMainWhiteSubStackRight)
         upperMainStack.addArrangedSubview(collectedPointsStack)
-        collectedPointsStack.addArrangedSubview(whiteStackForCollectedPointsStack)
+        
+        collectedPointsStack.addArrangedSubview(collectedPointsWhiteStack)
         collectedPointsStack.addArrangedSubview(collectedPointsTitle)
         collectedPointsStack.addArrangedSubview(collectedPointsLabel)
         
@@ -646,26 +594,35 @@ class MainScreenViewController: UIViewController {
         achievment1Stack.addArrangedSubview(achievment1View)
         achievment1Stack.addArrangedSubview(whiteViewForAchievment1Stack)
         achievment1Stack.addArrangedSubview(achievmentVerSubStack1)
+        
         achievmentVerSubStack1.addArrangedSubview(achievment1Title)
         achievmentVerSubStack1.addArrangedSubview(achievment1Label)
+        
         achievment2Stack.addArrangedSubview(achievment2View)
         achievment2Stack.addArrangedSubview(whiteViewForAchievment2Stack)
         achievment2Stack.addArrangedSubview(achievmentVerSubStack2)
+        
         achievmentVerSubStack2.addArrangedSubview(achievment2Title)
         achievmentVerSubStack2.addArrangedSubview(achievment2Label)
+        
         achievment3Stack.addArrangedSubview(achievment3View)
         achievment3Stack.addArrangedSubview(whiteViewForAchievment3Stack)
         achievment3Stack.addArrangedSubview(achievmentVerSubStack3)
+        
         achievmentVerSubStack3.addArrangedSubview(achievment3Title)
         achievmentVerSubStack3.addArrangedSubview(achievment3Label)
+        
         achievment4Stack.addArrangedSubview(achievment4View)
         achievment4Stack.addArrangedSubview(whiteViewForAchievment4Stack)
         achievment4Stack.addArrangedSubview(achievmentVerSubStack4)
+        
         achievmentVerSubStack4.addArrangedSubview(achievment4Title)
         achievmentVerSubStack4.addArrangedSubview(achievment4Label)
+        
         achievment5Stack.addArrangedSubview(achievment5View)
         achievment5Stack.addArrangedSubview(whiteViewForAchievment5Stack)
         achievment5Stack.addArrangedSubview(achievmentVerSubStack5)
+        
         achievmentVerSubStack5.addArrangedSubview(achievment5Title)
         achievmentVerSubStack5.addArrangedSubview(achievment5Label)
     
@@ -697,45 +654,14 @@ class MainScreenViewController: UIViewController {
         batteryElement1.backgroundColor = .darkGray
         batteryElement2.backgroundColor = .darkGray
       
-        activeTasksStack.layer.cornerRadius = 10
-        activeTasksStack.layer.borderColor = UIColor.darkGray.cgColor
-        activeTasksStack.layer.borderWidth = 0.5
+        let stacksForBoardersSetting = [activeTasksStack, completedTasksStack, collectedPointsStack, achievmentsStack, batteryStack, bottomMainStack]
         
-        completedTasksStack.backgroundColor = .clear
-        completedTasksStack.layer.cornerRadius = 10
-        completedTasksStack.layer.borderColor = UIColor.darkGray.cgColor
-        completedTasksStack.layer.borderWidth = 0.5
-        
-        collectedPointsStack.backgroundColor = .clear
-        collectedPointsStack.layer.cornerRadius = 10
-        collectedPointsStack.layer.borderColor = UIColor.darkGray.cgColor
-        collectedPointsStack.layer.borderWidth = 0.5
-        
-        achievmentsStack.layer.cornerRadius = 10
-        achievmentsStack.layer.borderColor = UIColor.darkGray.cgColor
-        achievmentsStack.layer.borderWidth = 0.5
-        
-        let achievmentStacks = [achievment1Stack, achievment2Stack, achievment3Stack, achievment4Stack, achievment5Stack]
-        for s in achievmentStacks {
+        for s in stacksForBoardersSetting {
+            s.backgroundColor = .clear
             s.layer.cornerRadius = 10
             s.layer.borderColor = UIColor.darkGray.cgColor
-            s.layer.borderWidth = 0.0
+            s.layer.borderWidth = 0.5
         }
-        
-        batteryStack.backgroundColor = .clear
-        batteryStack.layer.cornerRadius = 10
-        batteryStack.layer.borderColor = UIColor.darkGray.cgColor
-        batteryStack.layer.borderWidth = 0.5
-        
-//        achievmentVerWhiteStack.backgroundColor = .yellow
-//        achievmentVerSecondarySubStack.backgroundColor = .red
-//        achievmentTitle.backgroundColor = .blue
-        
-        bottomMainStack.layer.cornerRadius = 10
-        bottomMainStack.layer.cornerRadius = 10
-        bottomMainStack.layer.borderColor = UIColor.darkGray.cgColor
-        bottomMainStack.layer.borderWidth = 0.5
-        
         
         let padding: CGFloat = 10
         
@@ -745,7 +671,6 @@ class MainScreenViewController: UIViewController {
             rootStack.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: padding),
             rootStack.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -padding),
             
-            
             upperMainStack.heightAnchor.constraint(equalTo: rootStack.heightAnchor, multiplier: 0.14),
             upperToMidleMainWhiteStack.heightAnchor.constraint(equalTo: rootStack.heightAnchor, multiplier: 0.01),
             midleMainStack.heightAnchor.constraint(equalTo: rootStack.heightAnchor, multiplier: 0.55),
@@ -753,30 +678,24 @@ class MainScreenViewController: UIViewController {
             bottomMainStack.heightAnchor.constraint(equalTo: rootStack.heightAnchor, multiplier: 0.29),
             
             activeTasksStack.widthAnchor.constraint(equalTo: upperMainStack.widthAnchor, multiplier: 0.28),
-            upperMainWhiteStack1.widthAnchor.constraint(equalTo: upperMainStack.widthAnchor, multiplier: 0.02),
+            upperMainWhiteSubStackLeft.widthAnchor.constraint(equalTo: upperMainStack.widthAnchor, multiplier: 0.02),
             completedTasksStack.widthAnchor.constraint(equalTo: upperMainStack.widthAnchor, multiplier: 0.28),
-            upperMainWhiteStack2.widthAnchor.constraint(equalTo: upperMainStack.widthAnchor, multiplier: 0.02),
+            upperMainWhiteSubStackRight.widthAnchor.constraint(equalTo: upperMainStack.widthAnchor, multiplier: 0.02),
             collectedPointsStack.widthAnchor.constraint(equalTo: upperMainStack.widthAnchor, multiplier: 0.40),
-            
-            
             
             achievmentsStack.widthAnchor.constraint(equalTo: midleMainStack.widthAnchor, multiplier: 0.68),
             whiteStackForMidleMainStack.widthAnchor.constraint(equalTo: midleMainStack.widthAnchor, multiplier: 0.02),
             batteryStack.widthAnchor.constraint(equalTo: midleMainStack.widthAnchor, multiplier: 0.3),
             
-            whiteStackForActiveTasksStack.heightAnchor.constraint(equalTo: activeTasksStack.heightAnchor, multiplier: 0.03),
-            whiteStackForCompletedTaskStack.heightAnchor.constraint(equalTo: completedTasksStack.heightAnchor, multiplier: 0.03),
-            whiteStackForCollectedPointsStack.heightAnchor.constraint(equalTo: collectedPointsStack.heightAnchor, multiplier: 0.03),
-            
-            
+            activeTasksWhiteStack.heightAnchor.constraint(equalTo: activeTasksStack.heightAnchor, multiplier: 0.03),
+            completedTasksWhiteStack.heightAnchor.constraint(equalTo: completedTasksStack.heightAnchor, multiplier: 0.03),
+            collectedPointsWhiteStack.heightAnchor.constraint(equalTo: collectedPointsStack.heightAnchor, multiplier: 0.03),
+                        
             achievmentTitle.heightAnchor.constraint(equalTo: achievmentVerMainSubStack.heightAnchor, multiplier: 0.07),
             achievmentVerSecondarySubStack.heightAnchor.constraint(equalTo: achievmentVerMainSubStack.heightAnchor, multiplier: 0.90),
             achievmentVerWhiteStack.heightAnchor.constraint(equalTo: achievmentVerMainSubStack.heightAnchor, multiplier: 0.03),
             
-//            achievmentTitle.centerYAnchor.constraint(equalTo: achievmentVerMainSubStack.centerYAnchor),
-            
             whiteStackForAchievmentStack.widthAnchor.constraint(equalTo: achievmentsStack.widthAnchor, multiplier: 0.01),
-            
             
             batteryElement1.widthAnchor.constraint(equalTo: batterySubStack2.widthAnchor, multiplier: 0.4),
             batteryWhiteElement1.widthAnchor.constraint(equalTo: batterySubStack2.widthAnchor, multiplier: 0.3),
@@ -786,7 +705,6 @@ class MainScreenViewController: UIViewController {
             batteryWhiteStack1.widthAnchor.constraint(equalTo: batteryStack.widthAnchor, multiplier: 0.05),
             batteryWhiteStack2.widthAnchor.constraint(equalTo: batteryStack.widthAnchor, multiplier: 0.05),
             
-
             achievment1View.widthAnchor.constraint(equalTo: achievment1Stack.widthAnchor, multiplier: 0.2),
             achievment2View.widthAnchor.constraint(equalTo: achievment2Stack.widthAnchor, multiplier: 0.2),
             achievment3View.widthAnchor.constraint(equalTo: achievment3Stack.widthAnchor, multiplier: 0.2),
@@ -810,10 +728,6 @@ class MainScreenViewController: UIViewController {
             achievment3Label.heightAnchor.constraint(equalTo: achievmentVerSubStack3.heightAnchor, multiplier: 0.3),
             achievment4Label.heightAnchor.constraint(equalTo: achievmentVerSubStack4.heightAnchor, multiplier: 0.3),
             achievment5Label.heightAnchor.constraint(equalTo: achievmentVerSubStack5.heightAnchor, multiplier: 0.3),
-
-            
         ])
-        
     }
-    
 }

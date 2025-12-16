@@ -13,24 +13,22 @@ final class TaskCoreDataManager {
     
     private let modelName = "CoreDataModel"
     
-    // MARK: - Core Data stack
     
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: modelName)
         container.loadPersistentStores { storeDescription, error in
             if let error = error as NSError? {
-                // Обработка ошибок конфигурации хранилища
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
         }
         return container
     }()
     
+    
     var viewContext: NSManagedObjectContext {
         return persistentContainer.viewContext
     }
     
-    // MARK: - Saving support
     
     func saveContext () {
         let context = viewContext
@@ -38,14 +36,12 @@ final class TaskCoreDataManager {
             do {
                 try context.save()
             } catch {
-                // Замена на безопасную обработку ошибок в продакшне
                 let nserror = error as NSError
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
         }
     }
-    
-    // MARK: - Convenience fetch helper
+
     
     func fetchRequest<T: NSManagedObject>(ofType type: T.Type,
                                           predicate: NSPredicate? = nil,
@@ -56,7 +52,6 @@ final class TaskCoreDataManager {
         return request
     }
     
-    // MARK: - Generic fetch with completion
     
     func fetchEntities<T: NSManagedObject>(_ type: T.Type,
                                            predicate: NSPredicate? = nil,
@@ -77,9 +72,7 @@ final class TaskCoreDataManager {
     }
     
     
-    
-    
-    // MARK: - Create helper
+    // MARK: - HELPER
     
     func createTaskEntity() -> Task {
         let context = viewContext
