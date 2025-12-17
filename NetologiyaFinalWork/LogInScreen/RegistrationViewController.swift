@@ -49,6 +49,11 @@ class RegistrationViewController: UIViewController, UITextFieldDelegate {
             $0.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 1))
             $0.leftViewMode = .always
             $0.adjustsFontSizeToFitWidth = true
+            $0.keyboardType = .asciiCapable
+            $0.autocorrectionType = .no
+            $0.autocapitalizationType = .none
+            $0.spellCheckingType = .no
+            $0.autocapitalizationType = .none
         }
         
         mainStack.translatesAutoresizingMaskIntoConstraints = false
@@ -66,14 +71,17 @@ class RegistrationViewController: UIViewController, UITextFieldDelegate {
         
         usernameField.placeholder = "Придумайте логин"
         usernameField.font = UIFont.systemFont(ofSize: 14)
+        usernameField.textContentType = .username
         
         passwordField.placeholder = "Придумайте пароль"
         passwordField.isSecureTextEntry = true
         passwordField.font = UIFont.systemFont(ofSize: 14)
+        usernameField.textContentType = .newPassword
         
         confirmPasswordField.placeholder = "Повторите пароль"
         confirmPasswordField.isSecureTextEntry = true
         confirmPasswordField.font = UIFont.systemFont(ofSize: 14)
+        usernameField.textContentType = .newPassword
         
         registerBtn.setTitle("Зарегистрироваться", for: .normal)
         registerBtn.translatesAutoresizingMaskIntoConstraints = false

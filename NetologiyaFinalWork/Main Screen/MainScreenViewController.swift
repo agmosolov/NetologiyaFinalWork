@@ -303,6 +303,7 @@ class MainScreenViewController: UIViewController {
             achievment1View.image = UIImage(named: "ActiveTasksColor")
             achievment1Title.textColor = .systemBlue.withAlphaComponent(0.75)
             achievment1Label.textColor = .black
+            achievment1View.pulse()
             countOfAchievments[0] = 1
         } else {
             achievment1View.image = UIImage(named: "ActiveTasksGray")
@@ -322,6 +323,7 @@ class MainScreenViewController: UIViewController {
             achievment2View.image = UIImage(named: "CompletedTasksColor")
             achievment2Title.textColor = .systemBlue.withAlphaComponent(0.75)
             achievment2Label.textColor = .black
+            achievment2View.pulse()
             countOfAchievments[1] = 1
         } else {
             achievment2View.image = UIImage(named: "CompletedTasksGray")
@@ -341,6 +343,7 @@ class MainScreenViewController: UIViewController {
             achievment3View.image = UIImage(named: "CollectedPointsColor")
             achievment3Title.textColor = .systemBlue.withAlphaComponent(0.75)
             achievment3Label.textColor = .black
+            achievment3View.pulse()
             countOfAchievments[2] = 1
         } else {
             achievment3View.image = UIImage(named: "CollectedPointsGray")
@@ -358,6 +361,7 @@ class MainScreenViewController: UIViewController {
             achievment4View.image = UIImage(named: "RegimeColor")
             achievment4Title.textColor = .systemBlue.withAlphaComponent(0.75)
             achievment4Label.textColor = .black
+            achievment4View.pulse()
             countOfAchievments[3] = 1
         } else {
             achievment4View.image = UIImage(named: "RegimeGray")
@@ -377,13 +381,13 @@ class MainScreenViewController: UIViewController {
             achievment5View.image = UIImage(named: "AllAchievmentsColor")
             achievment5Title.textColor = .systemBlue.withAlphaComponent(0.75)
             achievment5Label.textColor = .black
+            achievment5View.pulse()
         } else {
             achievment5View.image = UIImage(named: "AllAchievmentsGray")
             achievment5Title.textColor = .lightGray
             achievment5Label.textColor = .lightGray
         }
     }
-    
     
     // Обновление labels достижений
     private func updateAchievmentLabels() {
@@ -741,5 +745,32 @@ class MainScreenViewController: UIViewController {
             achievment4Label.heightAnchor.constraint(equalTo: achievmentVerSubStack4.heightAnchor, multiplier: 0.3),
             achievment5Label.heightAnchor.constraint(equalTo: achievmentVerSubStack5.heightAnchor, multiplier: 0.3),
         ])
+    }
+}
+
+extension UIView {
+    func pulse(repeats: Int = 2,
+               duration: TimeInterval = 0.25,
+               scale: CGFloat = 1.10) {
+        guard repeats > 0 else { return }
+        let originalTransform = self.transform
+
+        func performPulse(_ remaining: Int) {
+            UIView.animate(withDuration: duration, animations: {
+                self.transform = originalTransform.scaledBy(x: scale, y: scale)
+            }) { _ in
+                UIView.animate(withDuration: duration, animations: {
+                    self.transform = originalTransform
+                }) { _ in
+                    if remaining > 1 {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                            performPulse(remaining - 1)
+                        }
+                    }
+                }
+            }
+        }
+
+        performPulse(repeats)
     }
 }

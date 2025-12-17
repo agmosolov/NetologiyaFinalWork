@@ -97,6 +97,12 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         loginField.textAlignment = .left
         loginField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 1))
         loginField.leftViewMode = .always
+        loginField.keyboardType = .asciiCapable
+        loginField.autocorrectionType = .no
+        loginField.autocapitalizationType = .none
+        loginField.spellCheckingType = .no
+        loginField.autocapitalizationType = .none
+        loginField.textContentType = .username
         
         passwordField.placeholder = "Введите пароль"
         passwordField.isSecureTextEntry = true
@@ -106,6 +112,12 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         passwordField.textAlignment = .left
         passwordField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 1))
         passwordField.leftViewMode = .always
+        passwordField.keyboardType = .asciiCapable
+        passwordField.autocorrectionType = .no
+        passwordField.autocapitalizationType = .none
+        passwordField.spellCheckingType = .no
+        passwordField.autocapitalizationType = .none
+        passwordField.textContentType = .password
         
         loginButton.setTitle("Войти", for: .normal)
         loginButton.addTarget(self, action: #selector(didTapLogin), for: .touchUpInside)
