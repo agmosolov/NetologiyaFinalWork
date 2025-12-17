@@ -130,6 +130,8 @@ class MainScreenViewController: UIViewController {
     
     private var isAnimating = false
     
+    var logoutButton = UIBarButtonItem()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -393,6 +395,11 @@ class MainScreenViewController: UIViewController {
     }
     
     
+    @objc private func didTapLogout() {
+        NotificationCenter.default.post(name: NSNotification.Name("LogoutRequested"), object: nil)
+    }
+    
+    
     private func setupUI() {
         
         view.backgroundColor = .white
@@ -401,6 +408,11 @@ class MainScreenViewController: UIViewController {
         navigationItem.largeTitleDisplayMode = .always
         title = "Мой режим"
         navigationController?.navigationBar.largeTitleTextAttributes = [.foregroundColor: UIColor.black]
+        
+        logoutButton = UIBarButtonItem(title: "Выйти", style: .plain, target: self, action: #selector(didTapLogout))
+        navigationItem.leftBarButtonItem = logoutButton
+        
+        
         
         batteryTitle.text = "Режим"
         batteryTitle.textAlignment = .center

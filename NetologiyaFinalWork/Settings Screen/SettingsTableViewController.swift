@@ -206,15 +206,19 @@ class SettingsTableViewController: UITableViewController {
         switch indexPath.row {
         case 0:
             cell.textLabel?.text = "Активные задачи"
+            cell.textLabel?.textColor = .darkGray
             addTextField(activeTasksToWinField, to: cell)
         case 1:
             cell.textLabel?.text = "Выполненные повторения"
+            cell.textLabel?.textColor = .darkGray
             addTextField(completedTasksToWinField, to: cell)
         case 2:
             cell.textLabel?.text = "Набранные баллы"
+            cell.textLabel?.textColor = .darkGray
             addTextField(collectedPointsToWinField, to: cell)
         case 3:
             cell.textLabel?.text = "% в режиме"
+            cell.textLabel?.textColor = .darkGray
             addTextField(regimeComplianceToWinField, to: cell)
         default:
             break
