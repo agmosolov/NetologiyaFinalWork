@@ -8,16 +8,16 @@
 import Foundation
 import UIKit
 
+
 protocol LoginDelegate: AnyObject {
     func loginDidSucceed()
     func logoutRequested()
 }
 
+
 class LoginViewController: UIViewController, UITextFieldDelegate {
     
     weak var delegate: LoginDelegate?
-    
-    private var bottomConstraint: NSLayoutConstraint?
     
     private let mainStack = UIStackView()
     
@@ -38,7 +38,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
         setupUI()
     }
     
@@ -56,8 +55,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
                tap.cancelsTouchesInView = false
                view.addGestureRecognizer(tap)
-        
-        
         
         mainStack.axis = .vertical
         mainStack.distribution = .equalSpacing
@@ -164,9 +161,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         let padding: CGFloat = 50
         let mainStackTopPadding = view.safeAreaLayoutGuide.layoutFrame.height * 0.1
         
-        // простые констрейнты (адаптируйте под стиль)
         NSLayoutConstraint.activate([
-            
             
             mainStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: mainStackTopPadding),
             mainStack.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: padding),
@@ -205,14 +200,17 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             return true
         }
     
+    
     @objc private func dismissKeyboard() {
            view.endEditing(true)
        }
 
+    
        deinit {
            NotificationCenter.default.removeObserver(self)
        }
 
+    
     @objc private func didTapLogin() {
         let username = loginField.text ?? ""
         let password = passwordField.text ?? ""
@@ -221,7 +219,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             UserDefaults.standard.set(username, forKey: "loggedUsername")
             NotificationCenter.default.post(name: NSNotification.Name("LoginDidSucceed"), object: nil)
         } else {
-            // показать алерт об ошибке
             let alert = UIAlertController(title: "Ошибка входа",
                                           message: "Неверное имя пользователя или пароль.",
                                           preferredStyle: .alert)
@@ -230,8 +227,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
+    
     @objc private func didTapRegister() {
-        // переход к RegistrationViewController
         let regVC = RegistrationViewController()
         navigationController?.pushViewController(regVC, animated: true)
         NotificationCenter.default.post(name: NSNotification.Name("RegisterDidTap"), object: nil)

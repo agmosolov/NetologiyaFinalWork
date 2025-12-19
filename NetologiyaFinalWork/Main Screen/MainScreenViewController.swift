@@ -224,7 +224,6 @@ class MainScreenViewController: UIViewController {
             guard let self = self else { t.invalidate(); return }
             if upward {
                 if self.currentIndex < self.targetFilled {
-                    // окрашиваем следующий элемент
                     DispatchQueue.main.asyncAfter(deadline: .now() + self.stepDelay) {
                         self.batteryLevels[self.currentIndex].backgroundColor = .systemBlue.withAlphaComponent(0.5)
                         self.currentIndex += 1
@@ -233,11 +232,9 @@ class MainScreenViewController: UIViewController {
                     t.invalidate()
                 }
             } else {
-                // вниз: уменьшаем
                 if self.currentIndex > self.targetFilled {
                     let idxToClear = self.currentIndex - 1
                     if idxToClear >= 0 {
-                        // серый
                         DispatchQueue.main.asyncAfter(deadline: .now() + self.stepDelay) {
                             self.batteryLevels[idxToClear].backgroundColor = .lightGray
                             self.currentIndex -= 1
@@ -249,7 +246,6 @@ class MainScreenViewController: UIViewController {
                     t.invalidate()
                 }
             }
-            // завершение
             if self.currentIndex == self.targetFilled && upward {
                 t.invalidate()
             }

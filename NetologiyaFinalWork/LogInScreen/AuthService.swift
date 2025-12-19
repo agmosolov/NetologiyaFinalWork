@@ -8,7 +8,9 @@
 import Foundation
 
 
+
 class AuthService {
+   
     static let shared = AuthService()
 
     func register(username: String, password: String) {
@@ -18,9 +20,9 @@ class AuthService {
         UserDefaults.standard.set(true, forKey: "isRegistered")
         UserDefaults.standard.synchronize()
         KeychainHelper.savePassword(password, for: trimmed)
-        // уведомление можно публиковать после успешной регистрации
     }
 
+    
     func login(username: String, password: String) -> Bool {
         guard let registered = UserDefaults.standard.string(forKey: "registeredUsername"),
               registered == username else { return false }

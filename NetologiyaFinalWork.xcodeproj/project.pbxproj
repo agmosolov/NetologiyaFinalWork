@@ -41,14 +41,12 @@
 		6D0C8F9F2EDDF9BE00159A45 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6D0C8FA12EDDF9BE00159A45 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6D0C8FA72EDDFEA000159A45 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		6D12C3B92EE410E100B997B1 /* BRIEF.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = BRIEF.md; sourceTree = "<group>"; };
 		6D30B9F62EE3874500BFCF8B /* TaskStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskStatus.swift; sourceTree = "<group>"; };
 		6D30B9F82EE3875500BFCF8B /* PlanValueForCyclecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanValueForCyclecycle.swift; sourceTree = "<group>"; };
 		6D30B9FA2EE390FD00BFCF8B /* TaskLogTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskLogTableViewCell.swift; sourceTree = "<group>"; };
 		6D5B28BB2EDF8255000828F7 /* TaskCoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCoreDataManager.swift; sourceTree = "<group>"; };
 		6D5B28BD2EDF869E000828F7 /* TasksTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksTableViewCell.swift; sourceTree = "<group>"; };
 		6D5B28BF2EDF98AD000828F7 /* Cyclicality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cyclicality.swift; sourceTree = "<group>"; };
-		6D5B28C12EDF99A3000828F7 /* DEVELOPMEN PLAN.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "DEVELOPMEN PLAN.md"; sourceTree = "<group>"; };
 		6D5CCC042EF1F03D00EA9AA4 /* LogInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInViewController.swift; sourceTree = "<group>"; };
 		6D7E04072EF1FADC00393B3B /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		6D7E04092EF1FB2600393B3B /* RegistrationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationViewController.swift; sourceTree = "<group>"; };
@@ -110,9 +108,7 @@
 				6D0C8F9C2EDDF9BE00159A45 /* Assets.xcassets */,
 				6D0C8F9E2EDDF9BE00159A45 /* LaunchScreen.storyboard */,
 				6D0C8FA12EDDF9BE00159A45 /* Info.plist */,
-				6D12C3B92EE410E100B997B1 /* BRIEF.md */,
 				6D0C8FA72EDDFEA000159A45 /* README.md */,
-				6D5B28C12EDF99A3000828F7 /* DEVELOPMEN PLAN.md */,
 			);
 			path = NetologiyaFinalWork;
 			sourceTree = "<group>";

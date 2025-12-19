@@ -20,14 +20,14 @@ class RegistrationViewController: UIViewController, UITextFieldDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
         setupUI()
-        
     }
 
+    
     private func setupUI() {
         
-    
+        view.backgroundColor = .systemBackground
+        
         self.navigationItem.title = "Регистрация"
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
@@ -39,7 +39,6 @@ class RegistrationViewController: UIViewController, UITextFieldDelegate {
         usernameField.delegate = self
         passwordField.delegate = self
         confirmPasswordField.delegate = self
-        
         
         [usernameField, passwordField, confirmPasswordField].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -60,7 +59,6 @@ class RegistrationViewController: UIViewController, UITextFieldDelegate {
         mainStack.axis = .vertical
         mainStack.spacing = 10
         mainStack.distribution = .fillEqually
-        
         
         view.addSubview(mainStack)
         
@@ -97,10 +95,8 @@ class RegistrationViewController: UIViewController, UITextFieldDelegate {
         registerBtn.layer.shadowOffset = CGSize(width: 0, height: 2)
         registerBtn.layer.masksToBounds = false
 
-        
         let padding: CGFloat = 50
         let mainStackTopPadding = view.safeAreaLayoutGuide.layoutFrame.height * 0.1
-        
         
         NSLayoutConstraint.activate([
             
@@ -132,7 +128,6 @@ class RegistrationViewController: UIViewController, UITextFieldDelegate {
         guard password == confirm else { return }
 
         AuthService.shared.register(username: trimmed, password: password)
-        // переход осуществляйте через уведомление/делегат как обсуждали ранее
         NotificationCenter.default.post(name: NSNotification.Name("RegistrationDidSucceed"), object: nil)
         navigationController?.popViewController(animated: true)
     }
