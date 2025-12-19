@@ -9,7 +9,7 @@ import UIKit
 
 
 
-class TaskTableViewCell: UITableViewCell {
+class TasksTableViewCell: UITableViewCell {
     
     let taskNameLabel = UILabel()
     let cyclicalityLabel = UILabel()
